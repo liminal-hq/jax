@@ -1,0 +1,32 @@
+# Version updates are set up but switched off: the open pull request limit is 0, which stops
+# Dependabot opening pull requests. To turn them on, raise each limit (for example to 5).
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 0
+    labels:
+      - 'build'
+    groups:
+      three:
+        patterns:
+          - 'three'
+          - '@types/three'
+      tooling:
+        patterns:
+          - 'eslint*'
+          - '@eslint/*'
+          - 'typescript*'
+          - 'prettier'
+          - 'vitest'
+          - 'vite'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 0
+    labels:
+      - 'ci'
