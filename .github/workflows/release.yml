@@ -193,10 +193,20 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
+          # Node 24 ships an npm that supports trusted publishing (11.5.1 or newer), and the
+          # runner's tool cache is writable, unlike the system Node.
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Use an npm that supports trusted publishing
-        run: npm install -g npm@^11.5.1
+      - name: Check npm supports trusted publishing
+        run: |
+          set -euo pipefail
+          NPM_VERSION="$(npm --version)"
+          echo "npm ${NPM_VERSION}"
+          if [[ "$(printf '%s\n' 11.5.1 "${NPM_VERSION}" | sort -V | head -n 1)" != "11.5.1" ]]; then
+            echo "npm ${NPM_VERSION} is older than 11.5.1, which trusted publishing needs" >&2
+            exit 1
+          fi
 
       - name: Publish package
         run: |
