@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 import { describe, expect, it, vi } from 'vitest';
-import type { BufferGeometry, Material, Object3D } from 'three';
+import { Vector3, type BufferGeometry, type Material, type Object3D } from 'three';
 import { POSE_CHANNELS, PROP_CHANNELS, neutralPose, type PoseChannel } from '../types';
 import { defaultSkin } from './defaultSkin';
 import { PROP_CHANNEL, PROP_NAMES, buildOtter } from './otter';
@@ -51,7 +51,123 @@ describe('otter rig', () => {
   });
 
   it('has a prop for every prop channel', () => {
-    expect(PROP_NAMES.map((n) => PROP_CHANNEL[n]).sort()).toEqual([...PROP_CHANNELS].sort());
+    // The book he holds has its own channel and is not one of the swappable props
+    const expected = PROP_CHANNELS.filter((c) => c !== 'propBook');
+    expect(PROP_NAMES.map((n) => PROP_CHANNEL[n]).sort()).toEqual([...expected].sort());
+  });
+
+  it('shows the book at rest, shrinks it away with `propBook` and brings it back', () => {
+    const rig = buildOtter(defaultSkin);
+    rig.apply(neutralPose());
+    expect(rig.book.visible).toBe(true);
+    expect(rig.book.scale.x).toBeCloseTo(1, 5);
+    const away = neutralPose();
+    away.propBook = 0;
+    rig.apply(away);
+    expect(rig.book.visible).toBe(false);
+    // Other props do not move the book any more
+    const hat = neutralPose();
+    hat.propHat = 1;
+    rig.apply(hat);
+    expect(rig.book.visible).toBe(true);
+  });
+
+  it('shows the thumb with `propThumb` and nothing else', () => {
+    const rig = buildOtter(defaultSkin);
+    const pose = neutralPose();
+    pose.propThumb = 1;
+    rig.apply(pose);
+    expect(rig.props.thumb.visible).toBe(true);
+    for (const name of PROP_NAMES)
+      if (name !== 'thumb') expect(rig.props[name].visible).toBe(false);
+  });
+
+  it('lies him on his back with `bodyRoll` alone, not with a prop', () => {
+    const rig = buildOtter(defaultSkin);
+    const water = neutralPose();
+    water.propWater = 1;
+    rig.apply(water);
+    expect(rig.body.rotation.z).toBe(0);
+    const roll = neutralPose();
+    roll.bodyRoll = -Math.PI / 2;
+    rig.apply(roll);
+    expect(rig.body.rotation.z).toBeCloseTo(-Math.PI / 2, 5);
+  });
+
+  describe('sign conventions', () => {
+    /** Where the end of an arm (one unit down its length) lands in the figure's space. */
+    function armEnd(rig: ReturnType<typeof buildOtter>, arm: 'armL' | 'armR'): Vector3 {
+      rig.group.updateMatrixWorld(true);
+      return rig.group.worldToLocal(rig[arm].localToWorld(new Vector3(0, -1, 0)));
+    }
+
+    it('lifts both arms outwards for a positive raise, mirroring the left', () => {
+      const rig = buildOtter(defaultSkin);
+      rig.apply(neutralPose());
+      const hangL = armEnd(rig, 'armL');
+      const hangR = armEnd(rig, 'armR');
+      const pose = neutralPose();
+      pose.armLRaise = 1;
+      pose.armRRaise = 1;
+      rig.apply(pose);
+      const l = armEnd(rig, 'armL');
+      const r = armEnd(rig, 'armR');
+      expect(l.x - hangL.x).toBeLessThan(-0.5);
+      expect(r.x - hangR.x).toBeGreaterThan(0.5);
+      expect(l.y).toBeGreaterThan(hangL.y);
+      expect(r.y).toBeGreaterThan(hangR.y);
+      expect(l.y).toBeCloseTo(r.y, 5);
+    });
+
+    it('swings both arms towards the viewer for a positive forward', () => {
+      const rig = buildOtter(defaultSkin);
+      const pose = neutralPose();
+      pose.armLForward = 0.6;
+      pose.armRForward = 0.6;
+      rig.apply(pose);
+      expect(armEnd(rig, 'armL').z).toBeGreaterThan(0.3);
+      expect(armEnd(rig, 'armR').z).toBeGreaterThan(0.3);
+    });
+
+    it('nods down for a positive pitch, squashes for a positive squash and looks up for a positive lookY', () => {
+      const rig = buildOtter(defaultSkin);
+      rig.apply(neutralPose());
+      const nose = () => {
+        rig.group.updateMatrixWorld(true);
+        return rig.group.worldToLocal(rig.head.localToWorld(new Vector3(0, 0, 1)));
+      };
+      const level = nose().y;
+      const pose = neutralPose();
+      pose.headPitch = 0.4;
+      pose.bodySquash = 0.2;
+      pose.lookY = 1;
+      rig.apply(pose);
+      expect(nose().y).toBeLessThan(level - 0.2);
+      expect(rig.body.scale.y).toBeLessThan(1);
+      expect(rig.eyes.position.y).toBeGreaterThan(0.12);
+    });
+
+    it('accepts yaw past a full turn and draws it as the same pose', () => {
+      const rig = buildOtter(defaultSkin);
+      const pose = neutralPose();
+      pose.bodyYaw = 0.5;
+      pose.headYaw = 0.3;
+      rig.apply(pose);
+      rig.group.updateMatrixWorld(true);
+      const before = rig.body.matrix.clone();
+      const headBefore = rig.head.matrix.clone();
+      pose.bodyYaw = 0.5 + Math.PI * 4;
+      pose.headYaw = 0.3 - Math.PI * 2;
+      rig.apply(pose);
+      rig.group.updateMatrixWorld(true);
+      expect(rig.body.rotation.y).toBeCloseTo(0.5 + Math.PI * 4, 9);
+      for (const [a, b] of [
+        [before, rig.body.matrix],
+        [headBefore, rig.head.matrix]
+      ]) {
+        for (let i = 0; i < 16; i++) expect(b.elements[i]).toBeCloseTo(a.elements[i], 5);
+      }
+    });
   });
 
   it('hides a prop at exactly 0 and shows it at 1', () => {
