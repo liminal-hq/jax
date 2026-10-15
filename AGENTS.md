@@ -2,7 +2,7 @@
 
 ## Project Status
 
-`@liminal-hq/jax` is the Jax library: the Liminal HQ otter as a small 3D companion that lives in an app, with calm, spring-smoothed moods. The shared contract is in `src/types.ts`. The core scene and renderer (`src/model`, `src/render`, `src/fallback`) and the motion engine (`src/motion`) are built to that contract. Update this section as each part lands.
+`@liminal-hq/jax` is the Jax library: the Liminal HQ otter as a small 3D companion that lives in an app, with calm, spring-smoothed moods. The shared contract is in `src/types.ts`. The scene and renderer have landed: the slab builder, the otter rig and default skin (`src/model`), `createJax` with its gated render loop (`src/render`), the SVG fallback (`src/fallback`) and a Vite demo (`bun run demo`). `createJax` currently drives a TEMPORARY stand-in motion, `src/render/stubMotion.ts`, which only holds a neutral pose with a gentle bob. To integrate the motion engine, make `createJax` default `internal.createMotion` to `createMotion` from `src/motion` (passing the default patterns when `options.patterns` is empty), delete `stubMotion.ts`, and export what `src/motion` should expose from `src/index.ts`. The look of the 3D model has not yet been judged in a real browser. Update this section as each part lands.
 
 ## Coding Standards
 
