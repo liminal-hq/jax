@@ -280,7 +280,7 @@ const nap = pattern(
   'nap',
   {
     bodyRoll: NAP_ROLL,
-    bodyLift: -0.55,
+    bodyLift: 0,
     headRoll: 0.1,
     armLRaise: 0.5,
     armRRaise: 0.5,
@@ -290,7 +290,7 @@ const nap = pattern(
   },
   (t) => ({
     bodyRoll: NAP_ROLL + 0.03 * osc(t, 8.6),
-    bodyLift: -0.55 + 0.06 * osc(t, 7),
+    bodyLift: 0.06 * osc(t, 7),
     bodySquash: 0.02 * osc(t, 5),
     headRoll: 0.1 + 0.02 * osc(t, 9),
     armLRaise: 0.5,

@@ -751,7 +751,7 @@ export function buildOtter(skin: Skin): OtterRig {
     const squashXZ = 1 + pose.bodySquash * 0.5;
     body.scale.set(squashXZ, squashY, squashXZ);
     body.position.set(
-      0.15 * lie,
+      0.55 * lie,
       BASE_Y - 1.1 * lie + pose.bodyBob + pose.bodyLift - FEET_Y * (squashY - 1),
       0
     );
