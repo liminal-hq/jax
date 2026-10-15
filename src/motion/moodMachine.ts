@@ -46,7 +46,11 @@ export interface MoodMachine {
   request(mood: Mood): void;
   /** Let go of a held mood. */
   release(mood: Mood): void;
-  /** Let go of every held mood and any queued transient. A transient already playing finishes. */
+  /**
+   * Let go of every held mood and any queued transient. A transient already playing finishes. It
+   * takes effect with the next `request`, `activity` or `step`, so `releaseAll()` then `request(x)`
+   * goes straight to `x` without passing through chill.
+   */
   releaseAll(): void;
   /** Something happened: wake from a nap and restart the quiet clock. */
   activity(): void;
@@ -155,7 +159,6 @@ export function createMoodMachine(options: MoodMachineOptions = {}): MoodMachine
       holds = [];
       queued = null;
       touch(at);
-      update(at);
     },
     activity() {
       const at = now();
