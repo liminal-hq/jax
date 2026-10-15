@@ -1,0 +1,66 @@
+{
+  "name": "@liminal-hq/jax",
+  "version": "0.0.0",
+  "description": "Jax, the Liminal HQ otter — a small 3D companion with calm, spring-smoothed moods for apps, with a no-WebGL fallback.",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./fallback": {
+      "types": "./dist/fallback/index.d.ts",
+      "default": "./dist/fallback/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "docs:api": "typedoc"
+  },
+  "keywords": [
+    "mascot",
+    "companion",
+    "three",
+    "animation",
+    "liminal-hq"
+  ],
+  "license": "Apache-2.0 OR MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liminal-hq/jax.git"
+  },
+  "engines": {
+    "node": ">=20",
+    "bun": ">=1.2"
+  },
+  "peerDependencies": {
+    "three": ">=0.160.0 <1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.1.1",
+    "@types/three": "^0.160.0",
+    "eslint": "^10.7.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
+    "three": "^0.160.0",
+    "typedoc": "^0.28.20",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.65.0",
+    "vite": "^8.1.5",
+    "vitest": "^4.1.10"
+  }
+}
