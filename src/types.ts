@@ -131,6 +131,14 @@ export interface AnimationPattern {
   smoothTime?: Partial<Record<PoseChannel, number>>;
 }
 
+/**
+ * The hats he can wear. `'party'` is the paper cone the party mood also brings; choosing it keeps it
+ * on in every mood.
+ */
+export const HATS = ['none', 'peakCap', 'topHat', 'party'] as const;
+
+export type Hat = (typeof HATS)[number];
+
 /** Looks only; no behaviour. An app swaps skins to dress him differently. */
 export interface Skin {
   name: string;
@@ -142,13 +150,25 @@ export interface Skin {
     nose: number;
     eye: number;
     shine: number;
+    /** The rosy cheeks, drawn only when `cheeks` is on. Also colours a few small props. */
     blush: number;
+    /** The main colour of the chosen `hat` (the party hat keeps the book and accent colours). Missing means a deep charcoal. */
+    hat?: number;
+    /** The band, button or accent on the chosen `hat`. Missing means the skin's `accent`. */
+    hatBand?: number;
     book: number;
     pages: number;
     accent: number;
     prop: number;
     water: number;
   };
+  /** Show rosy cheeks. Default `false`. */
+  cheeks?: boolean;
+  /**
+   * The hat he wears. Default `'none'`. It steps aside while the party mood's own hat is showing and
+   * returns afterwards. The exception is `'party'`, which stays on and is never doubled by the mood.
+   */
+  hat?: Hat;
   /** The key light, fill and rim colours. */
   lights: { sky: number; ground: number; key: number; rim: number };
   /** Which props this skin allows. Missing means allowed. */

@@ -22,7 +22,16 @@ import {
   type Object3D
 } from 'three';
 import { POSE_CHANNELS, neutralPose, type Pose, type PoseChannel, type Skin } from '../types.js';
-import { ellipse, rect, ring, slab, triangle, createSlabCache, type SlabCache } from './slab.js';
+import {
+  ellipse,
+  rect,
+  ring,
+  slab,
+  triangle,
+  createSlabCache,
+  type ShapeDef,
+  type SlabCache
+} from './slab.js';
 
 export const PROP_NAMES = [
   'page',
@@ -70,6 +79,8 @@ export interface OtterRig {
   readonly book: Group;
   /** One pivot per prop. Hidden when its channel is exactly 0. */
   readonly props: Readonly<Record<PropName, Group>>;
+  /** The hat the skin asks for, parented to the head. Missing when the skin has none. */
+  readonly hat: Group | undefined;
   readonly cache: SlabCache;
   /** Draw this pose: every pose channel lands somewhere on the rig. */
   apply(pose: Readonly<Pose>): void;
@@ -109,6 +120,21 @@ interface Fader {
   material: Material;
   base: number;
 }
+
+/** The upper half of an ellipse with its flat base on y = 0: a cap's crown. */
+const dome = (rx: number, ry: number): ShapeDef => ({
+  key: `dome:${rx}:${ry}`,
+  make() {
+    const shape = new Shape();
+    shape.moveTo(-rx, 0);
+    shape.absellipse(0, 0, rx, ry, Math.PI, 0, true, 0);
+    shape.closePath();
+    return shape;
+  }
+});
+
+/** The hat's tag: its materials fade together as the party hat takes over. */
+const SKIN_HAT_TAG = 'skinHat';
 
 export function buildOtter(skin: Skin): OtterRig {
   const cache = createSlabCache();
@@ -243,16 +269,18 @@ export function buildOtter(skin: Skin): OtterRig {
       bevel: 0.04
     })
   );
-  for (const side of [-1, 1]) {
-    head.add(
-      slab(cache, {
-        shape: ellipse(0.1, 0.06),
+  if (skin.cheeks === true) {
+    for (const side of [-1, 1]) {
+      const cheek = slab(cache, {
+        shape: ellipse(0.11, 0.07),
         depth: 0.03,
         colour: c.blush,
-        position: [side * 0.48, -0.16, 0.37],
+        position: [side * 0.54, -0.16, 0.43],
         bevel: 0.02
-      })
-    );
+      });
+      cheek.name = 'cheek';
+      head.add(cheek);
+    }
   }
   const eyes = new Group();
   eyes.position.set(0, 0.12, 0.38);
@@ -565,41 +593,138 @@ export function buildOtter(skin: Skin): OtterRig {
     }
   }
 
-  // Party hat on the head
-  const hat = makeProp('hat', head);
-  hat.position.set(0.18, 0.55, 0);
-  hat.rotation.z = -0.3;
-  if (allowed('hat')) {
-    const m = tagged('hat');
-    hat.add(
+  // The party hat's cone, stripe and pompom. The mood prop and the chosen `'party'` hat share them.
+  const buildPartyHat = (target: Group, material: { tag: string; opacity: number }) => {
+    target.add(
       slab(cache, {
         shape: triangle(0.56, 0.7),
         depth: 0.3,
         colour: c.book,
         bevel: 0.03,
-        material: m
+        material
       })
     );
-    hat.add(
+    target.add(
       slab(cache, {
         shape: rect(0.4, 0.06),
         depth: 0.31,
         colour: c.accent,
         position: [0, 0.18, 0.01],
         bevel: 0.01,
-        material: m
+        material
       })
     );
-    hat.add(
+    target.add(
       slab(cache, {
         shape: ellipse(0.08, 0.08),
         depth: 0.12,
         colour: c.accent,
         position: [0, 0.72, 0],
         bevel: 0.02,
-        material: m
+        material
       })
     );
+  };
+  const partyHatPlace = (target: Group) => {
+    target.position.set(0.18, 0.55, 0);
+    target.rotation.z = -0.3;
+  };
+
+  // Party hat on the head, as the party mood's own prop. A skin that already wears the party hat
+  // never needs a second one, so the prop stays empty then.
+  const hat = makeProp('hat', head);
+  partyHatPlace(hat);
+  if (allowed('hat') && skin.hat !== 'party') buildPartyHat(hat, tagged('hat'));
+
+  // The hat the skin asks for, worn on the head. The mood's party hat takes priority while it shows,
+  // except when the chosen hat is the party hat itself, which simply stays on.
+  let skinHat: Group | undefined;
+  if (skin.hat === 'party') {
+    skinHat = new Group();
+    skinHat.name = 'hat-party';
+    partyHatPlace(skinHat);
+    buildPartyHat(skinHat, { tag: SKIN_HAT_TAG, opacity: 1 });
+    head.add(skinHat);
+  } else if (skin.hat === 'peakCap' || skin.hat === 'topHat') {
+    skinHat = new Group();
+    skinHat.name = `hat-${skin.hat}`;
+    const main = c.hat ?? 0x3a3550;
+    const band = c.hatBand ?? c.accent;
+    const m = { tag: SKIN_HAT_TAG, opacity: 1 };
+    if (skin.hat === 'peakCap') {
+      skinHat.add(
+        slab(cache, {
+          shape: dome(0.44, 0.4),
+          depth: 0.8,
+          colour: main,
+          position: [0, 0.5, 0],
+          bevel: 0.03,
+          material: m
+        })
+      );
+      skinHat.add(
+        slab(cache, {
+          shape: rect(0.9, 0.08),
+          depth: 0.9,
+          colour: band,
+          position: [0, 0.5, 0],
+          bevel: 0.01,
+          material: m
+        })
+      );
+      const peak = slab(cache, {
+        shape: rect(0.66, 0.06),
+        depth: 0.42,
+        colour: main,
+        position: [0, 0.46, 0.5],
+        bevel: 0.015,
+        material: m
+      });
+      peak.rotation.x = 0.4;
+      skinHat.add(peak);
+      skinHat.add(
+        slab(cache, {
+          shape: ellipse(0.05, 0.05),
+          depth: 0.1,
+          colour: band,
+          position: [0, 0.9, 0],
+          bevel: 0.02,
+          material: m
+        })
+      );
+    } else {
+      skinHat.add(
+        slab(cache, {
+          shape: rect(0.5, 0.5),
+          depth: 0.76,
+          colour: main,
+          position: [0, 0.85, 0],
+          bevel: 0.03,
+          material: m
+        })
+      );
+      const brim = slab(cache, {
+        shape: ellipse(0.46, 0.56),
+        depth: 0.05,
+        colour: main,
+        position: [0, 0.62, 0],
+        bevel: 0.015,
+        material: m
+      });
+      brim.rotation.x = Math.PI / 2;
+      skinHat.add(brim);
+      skinHat.add(
+        slab(cache, {
+          shape: rect(0.52, 0.14),
+          depth: 0.8,
+          colour: band,
+          position: [0, 0.72, 0],
+          bevel: 0.01,
+          material: m
+        })
+      );
+    }
+    head.add(skinHat);
   }
 
   // Confetti falls in the figure's own space, so it does not spin with him
@@ -710,6 +835,8 @@ export function buildOtter(skin: Skin): OtterRig {
     ];
   }
 
+  const skinHatMaterials = cache.materialsFor(SKIN_HAT_TAG);
+
   const presence = {} as Record<PoseChannel, number>;
   for (const channel of POSE_CHANNELS) presence[channel] = 0;
   let ambient = 0;
@@ -775,6 +902,17 @@ export function buildOtter(skin: Skin): OtterRig {
     // The page swings across the book as `pageFlip` runs from 0 to 1
     page.rotation.y = -Math.PI * clamp01(pose.pageFlip);
 
+    // The chosen hat is present exactly when the party hat is not. A chosen party hat is always on,
+    // and the mood's own hat is left out so there is never a second one.
+    if (skin.hat === 'party') hat.visible = false;
+    if (skinHat) {
+      const worn = skin.hat === 'party' ? 1 : 1 - clamp01(pose.propHat);
+      skinHat.visible = worn > 0;
+      skinHat.scale.setScalar(Math.max(easeOutBack(worn), 0.001));
+      const hatFade = Math.min(1, worn * 2);
+      for (const material of skinHatMaterials) material.opacity = hatFade;
+    }
+
     for (const name of PROP_NAMES) {
       const fade = Math.min(1, clamp01(pose[PROP_CHANNEL[name]]) * 2);
       for (const { material, base } of faders[name]) material.opacity = base * fade;
@@ -828,6 +966,7 @@ export function buildOtter(skin: Skin): OtterRig {
     tail,
     book,
     props,
+    hat: skinHat,
     cache,
     apply,
     update,

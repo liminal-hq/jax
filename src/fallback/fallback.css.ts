@@ -6,7 +6,7 @@
 // Class-name contract: every class starts with `lq-jax-`. The root `<svg>` carries
 // `lq-jax-fallback`, a `data-mood` attribute and, when motion is off, `lq-jax-still`. Parts are
 // `lq-jax-body`, `lq-jax-head`, `lq-jax-eyes`, `lq-jax-arm-l`, `lq-jax-arm-r` and `lq-jax-tail`.
-// Props are `lq-jax-prop-<name>` and show only for the moods that use them.
+// Props are `lq-jax-prop-<name>` and show only for the moods that use them. The optional cheeks are `lq-jax-cheek` and the worn hat is `lq-jax-worn-hat`, hidden for the party mood.
 
 export const FALLBACK_STYLE_ID = 'lq-jax-fallback-styles';
 
@@ -35,6 +35,8 @@ export const FALLBACK_CSS = `
 .lq-jax-fallback{display:block;overflow:visible}
 .lq-jax-fallback .lq-jax-prop{opacity:0;transition:opacity .4s ease}
 ${propRules}
+.lq-jax-fallback .lq-jax-worn-hat{transition:opacity .4s ease}
+.lq-jax-fallback[data-mood='party'] .lq-jax-worn-hat{opacity:0}
 .lq-jax-fallback[data-mood='nap'] .lq-jax-eyes{transform:scaleY(.12)}
 .lq-jax-fallback .lq-jax-eyes,.lq-jax-fallback .lq-jax-head,.lq-jax-fallback .lq-jax-arm-r,
 .lq-jax-fallback .lq-jax-arm-l,.lq-jax-fallback .lq-jax-body,.lq-jax-fallback .lq-jax-prop-confetti,

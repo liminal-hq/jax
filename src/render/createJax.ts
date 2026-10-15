@@ -97,8 +97,8 @@ export async function createJax(
 
   const scene = new Scene();
   const camera = new PerspectiveCamera(30, 1, 0.1, 50);
-  camera.position.set(0, -0.35, 8.6);
-  camera.lookAt(0, -0.45, 0);
+  camera.position.set(0, -0.3, 9.2);
+  camera.lookAt(0, -0.3, 0);
 
   let rig: OtterRig = buildOtter(skin);
   scene.add(rig.group);

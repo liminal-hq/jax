@@ -226,4 +226,102 @@ describe('otter rig', () => {
     rig.dispose();
     for (const spy of spies) expect(spy).toHaveBeenCalledTimes(1);
   });
+
+  describe('cheeks and hats', () => {
+    const cheeksIn = (rig: ReturnType<typeof buildOtter>) => {
+      const found: Object3D[] = [];
+      rig.group.traverse((o) => o.name === 'cheek' && found.push(o));
+      return found;
+    };
+
+    it('defaults to no cheeks and no hat', () => {
+      expect(defaultSkin.cheeks).toBe(false);
+      expect(defaultSkin.hat).toBe('none');
+      const rig = buildOtter(defaultSkin);
+      expect(cheeksIn(rig)).toHaveLength(0);
+      expect(rig.hat).toBeUndefined();
+    });
+
+    it('builds both cheeks only when asked', () => {
+      expect(cheeksIn(buildOtter({ ...defaultSkin, cheeks: true }))).toHaveLength(2);
+      expect(cheeksIn(buildOtter({ ...defaultSkin, cheeks: false }))).toHaveLength(0);
+    });
+
+    it('builds the named group for each hat on the head', () => {
+      for (const hat of ['peakCap', 'topHat', 'party'] as const) {
+        const rig = buildOtter({ ...defaultSkin, hat });
+        expect(rig.hat?.name).toBe(`hat-${hat}`);
+        expect(rig.hat?.parent).toBe(rig.head);
+        expect(rig.hat!.children.length).toBeGreaterThan(2);
+      }
+    });
+
+    it('steps aside for the party hat and returns afterwards', () => {
+      const rig = buildOtter({ ...defaultSkin, hat: 'topHat' });
+      const hat = rig.hat!;
+      const pose = neutralPose();
+      rig.apply(pose);
+      expect(hat.visible).toBe(true);
+      expect(hat.scale.x).toBeCloseTo(1, 5);
+      pose.propHat = 0.75;
+      rig.apply(pose);
+      expect(hat.visible).toBe(true);
+      expect(hat.scale.x).toBeLessThan(1.1);
+      const [material] = rig.cache.materialsFor('skinHat');
+      expect(material.opacity).toBeLessThan(1);
+      pose.propHat = 1;
+      rig.apply(pose);
+      expect(hat.visible).toBe(false);
+      expect(rig.props.hat.visible).toBe(true);
+      pose.propHat = 0;
+      rig.apply(pose);
+      expect(hat.visible).toBe(true);
+      expect(material.opacity).toBe(1);
+    });
+
+    it('keeps a chosen party hat on at every party strength, never doubled', () => {
+      const rig = buildOtter({ ...defaultSkin, hat: 'party' });
+      const pose = neutralPose();
+      for (const propHat of [0, 0.5, 1, 0]) {
+        pose.propHat = propHat;
+        rig.apply(pose);
+        const visible: Object3D[] = [];
+        rig.group.traverse((o) => {
+          const shown = (n: Object3D | null): boolean => !n || (n.visible && shown(n.parent));
+          if (o.name === 'hat-party' || o === rig.props.hat) {
+            if (shown(o) && o.children.length > 0) visible.push(o);
+          }
+        });
+        expect(visible).toHaveLength(1);
+        expect(visible[0]).toBe(rig.hat);
+        expect(rig.props.hat.visible).toBe(false);
+        expect(rig.hat!.scale.x).toBeCloseTo(1, 5);
+        const [material] = rig.cache.materialsFor('skinHat');
+        expect(material.opacity).toBe(1);
+      }
+    });
+
+    it('leaves the mood hat prop alone for the other hats', () => {
+      const rig = buildOtter({ ...defaultSkin, hat: 'topHat' });
+      expect(rig.props.hat.children.length).toBeGreaterThan(2);
+      const plain = buildOtter(defaultSkin);
+      expect(plain.props.hat.children.length).toBeGreaterThan(2);
+      const pose = neutralPose();
+      pose.propHat = 0.5;
+      plain.apply(pose);
+      expect(plain.props.hat.visible).toBe(true);
+    });
+
+    it('frees the hat and cheek geometry on dispose', () => {
+      const rig = buildOtter({ ...defaultSkin, hat: 'peakCap', cheeks: true });
+      const spies: ReturnType<typeof vi.spyOn>[] = [];
+      rig.hat!.traverse((o) => {
+        const mesh = o as { geometry?: BufferGeometry };
+        if (mesh.geometry) spies.push(vi.spyOn(mesh.geometry, 'dispose'));
+      });
+      expect(spies.length).toBeGreaterThan(2);
+      rig.dispose();
+      for (const spy of spies) expect(spy).toHaveBeenCalled();
+    });
+  });
 });
