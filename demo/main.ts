@@ -6,8 +6,10 @@
 import {
   createJax,
   defaultSkin,
+  HATS,
   JaxUnavailableError,
   MOODS,
+  type Hat,
   type Jax,
   type Mood,
   type Skin
@@ -32,7 +34,9 @@ const state = {
   fallback: false,
   reduced: false,
   cycling: false,
-  mood: 'chill' as Mood
+  mood: 'chill' as Mood,
+  cheeks: false,
+  hat: 'none' as Hat
 };
 let instances: Jax[] = [];
 let heroJax: Jax | undefined;
@@ -50,7 +54,8 @@ function button(label: string, onClick: () => void): HTMLButtonElement {
 }
 
 async function spawn(host: HTMLElement, size: number): Promise<Jax> {
-  const options = { size, skin: state.skin, reducedMotion: state.reduced };
+  const skin: Skin = { ...state.skin, cheeks: state.cheeks, hat: state.hat };
+  const options = { size, skin, reducedMotion: state.reduced };
   if (!state.fallback) {
     try {
       return await createJax(host, options);
@@ -127,6 +132,31 @@ const skinButton = button('Skin: afterglow', () => {
   void mountAll();
 });
 $('controls').append(skinButton);
+const HAT_LABELS: Record<Hat, string> = { none: 'none', peakCap: 'peak cap', topHat: 'top hat' };
+const cheeksButton = button('Cheeks', () => {
+  state.cheeks = !state.cheeks;
+  cheeksButton.setAttribute('aria-pressed', String(state.cheeks));
+  void mountAll();
+});
+cheeksButton.id = 'cheeks';
+cheeksButton.setAttribute('aria-pressed', 'false');
+$('controls').append(cheeksButton);
+const hatLabel = document.createElement('label');
+hatLabel.textContent = 'Hat ';
+const hatSelect = document.createElement('select');
+hatSelect.id = 'hat';
+for (const hat of HATS) {
+  const option = document.createElement('option');
+  option.value = hat;
+  option.textContent = HAT_LABELS[hat];
+  hatSelect.append(option);
+}
+hatSelect.addEventListener('change', () => {
+  state.hat = hatSelect.value as Hat;
+  void mountAll();
+});
+hatLabel.append(hatSelect);
+$('controls').append(hatLabel);
 toggle('Force fallback', 'fallback', () => void mountAll());
 toggle('Reduced motion', 'reduced', () => {
   for (const jax of instances) jax.setReducedMotion(state.reduced);
