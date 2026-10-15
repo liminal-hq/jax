@@ -1,6 +1,6 @@
 {
   "name": "@liminal-hq/jax",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Jax, the Liminal HQ otter — a small 3D companion with calm, spring-smoothed moods for apps, with a no-WebGL SVG fallback. TypeScript + three.js.",
   "type": "module",
   "main": "dist/index.js",
