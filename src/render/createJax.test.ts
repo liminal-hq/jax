@@ -120,6 +120,41 @@ async function setup(options = {}, extra: Partial<JaxInternals> = {}) {
   return { jax, scheduler, renderer, scenes, motion, dts };
 }
 
+describe('createJax motion wiring', () => {
+  it('uses the real motion engine with the default patterns and idle drift on', async () => {
+    const { renderer } = makeRenderer();
+    const scheduler = makeScheduler();
+    const jax = await createJax(host, {}, { createRenderer: () => renderer, scheduler });
+    expect(jax.mood).toBe('chill');
+    jax.setMood('nap');
+    // A nap takes the slow wake blend, so just check that the engine took the mood
+    expect(jax.mood).toBe('nap');
+    scheduler.advance(16);
+    scheduler.advance(40);
+    expect(renderer.render).toHaveBeenCalled();
+    jax.dispose();
+  });
+
+  it('asks for idle drift unless told otherwise, and falls back to the default patterns', async () => {
+    const seen: { autoIdle?: boolean; count: number }[] = [];
+    const factory = (options: { autoIdle?: boolean; patterns: readonly unknown[] }) => {
+      seen.push({ autoIdle: options.autoIdle, count: options.patterns.length });
+      return makeMotion().motion;
+    };
+    for (const options of [{}, { autoIdle: false, patterns: [] }]) {
+      const { renderer } = makeRenderer();
+      const jax = await createJax(host, options, {
+        createRenderer: () => renderer,
+        createMotion: factory,
+        scheduler: makeScheduler()
+      });
+      jax.dispose();
+    }
+    expect(seen[0]).toEqual({ autoIdle: true, count: 12 });
+    expect(seen[1]).toEqual({ autoIdle: false, count: 12 });
+  });
+});
+
 describe('createJax', () => {
   it('throws JaxUnavailableError when a renderer cannot be made', async () => {
     const failing = () => {
