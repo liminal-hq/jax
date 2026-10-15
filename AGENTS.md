@@ -54,6 +54,13 @@ Commit as you go with small, coherent commits.
 - `src/fallback/`: the no-WebGL SVG and CSS companion (no `three`).
 - `demo/`: a small demo page.
 
+## Releasing
+
+- The package is published to npm as `@liminal-hq/jax`. CI (`.github/workflows/ci.yml`) builds, tests, lints, checks formatting, builds the demo and checks the package contents on every pull request and push to `main`.
+- To release: bump `version` in `package.json` on a `chore/release-v<version>` branch, merge to `main`, then push a matching `vX.Y.Z` tag (or run the "Release" workflow with `workflow_dispatch`). The workflow verifies the tag matches `package.json`, packs the tarball with `scripts/check-package.mjs` guarding its contents, attaches it to a GitHub release and publishes to npm with provenance. The publish step waits for approval on the `npm-publish` environment.
+- Run the "Release" workflow with `release_draft` set to true to exercise the pipeline without publishing.
+- Dependabot version updates are configured in `.github/dependabot.yml` but switched off (`open-pull-requests-limit: 0`); raise the limits to turn them on.
+
 ## Licence and Copyright
 
 New source files need a header as the first content, before imports, on `.ts` files in `src/`. Not on generated files, lockfiles, config files or markdown.
