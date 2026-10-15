@@ -466,6 +466,38 @@ describe('moods', () => {
     expect(motion.mood).toBe('chill');
   });
 
+  it('wakes from a nap on activity, and puts the next nap off while there is some', () => {
+    const motion = engine({ autoIdle: true, random: () => 0.1 });
+    run(motion, 50, 60);
+    expect(motion.mood).toBe('nap');
+    motion.activity();
+    run(motion, 2, 60);
+    expect(motion.mood).not.toBe('nap');
+    // Regular activity keeps him from napping for far longer than the nap delay.
+    for (let i = 0; i < 100; i++) {
+      run(motion, 1, 30);
+      motion.activity();
+    }
+    expect(motion.mood).not.toBe('nap');
+  });
+
+  it('does not let activity change a mood the host is holding', () => {
+    const motion = engine({ autoIdle: true, random: () => 0 });
+    motion.setMood('writing');
+    for (let i = 0; i < 30; i++) {
+      run(motion, 2, 30);
+      motion.activity();
+    }
+    expect(motion.mood).toBe('writing');
+  });
+
+  it('ignores activity without autoIdle', () => {
+    const motion = engine();
+    motion.activity();
+    run(motion, 2, 30);
+    expect(motion.mood).toBe('chill');
+  });
+
   it('holds a host mood against the idle rotation', () => {
     const motion = engine({ autoIdle: true, random: () => 0 });
     motion.setMood('writing');

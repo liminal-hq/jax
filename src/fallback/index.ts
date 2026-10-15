@@ -218,6 +218,9 @@ export function createFallbackJax(host: HTMLElement, options: JaxOptions = {}): 
     pet() {
       api.setMood('wave');
     },
+    activity() {
+      // The fallback has no idle moods, so there is nothing to wake or put off.
+    },
     setReducedMotion: (on) => {
       if (!disposed) setStill(on);
     },

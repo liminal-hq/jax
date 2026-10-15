@@ -224,6 +224,10 @@ export async function createJax(
       motion.pet();
       markChanged();
     },
+    activity() {
+      motion.activity();
+      markChanged();
+    },
     setReducedMotion(on) {
       if (on === reduced) return;
       reduced = on;

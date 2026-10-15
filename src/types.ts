@@ -196,6 +196,11 @@ export interface Jax {
   setMood(mood: Mood): void;
   /** A friendly wave, as if he were petted. */
   pet(): void;
+  /**
+   * Tell him something is happening in the app. With `autoIdle`, he wakes if he is napping and puts
+   * off the next nap and idle change, without changing a mood that is being held.
+   */
+  activity(): void;
   setReducedMotion(on: boolean): void;
   /** Stop, release the GPU and remove the canvas. Safe to call twice. */
   dispose(): void;
@@ -206,6 +211,8 @@ export interface Motion {
   readonly mood: Mood;
   setMood(mood: Mood): void;
   pet(): void;
+  /** Something happened in the app; see `Jax.activity`. */
+  activity(): void;
   setReducedMotion(on: boolean): void;
   /** Advance by `dt` seconds (clamped inside) and return the pose to draw now. */
   step(dt: number): Readonly<Pose>;

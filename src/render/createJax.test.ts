@@ -55,6 +55,7 @@ function makeMotion() {
     },
     setMood: vi.fn((m: Mood) => void (mood = m)),
     pet: vi.fn(),
+    activity: vi.fn(),
     setReducedMotion: vi.fn(),
     step: vi.fn((dt: number) => {
       dts.push(dt);
@@ -242,6 +243,10 @@ describe('createJax', () => {
     expect(motion.setMood).toHaveBeenCalledWith('party');
     expect(renderer.render).toHaveBeenCalledTimes(2);
     expect(scheduler.pending).toBe(0);
+
+    // Activity reaches the motion, and draws a frame so a wake from a nap shows even when still.
+    jax.activity();
+    expect(motion.activity).toHaveBeenCalledTimes(1);
 
     query.set(false);
     expect(motion.setReducedMotion).toHaveBeenCalledWith(false);
