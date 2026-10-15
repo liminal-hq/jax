@@ -1,7 +1,7 @@
 {
   "name": "@liminal-hq/jax",
   "version": "0.0.0",
-  "description": "Jax, the Liminal HQ otter — a small 3D companion with calm, spring-smoothed moods for apps, with a no-WebGL fallback.",
+  "description": "Jax, the Liminal HQ otter — a small 3D companion with calm, spring-smoothed moods for apps, with a no-WebGL SVG fallback. TypeScript + three.js.",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -17,7 +17,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "LICENSE-APACHE",
+    "LICENSE-MIT"
   ],
   "sideEffects": false,
   "scripts": {
@@ -29,13 +31,20 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "docs:api": "typedoc"
+    "docs:api": "typedoc",
+    "check:package": "node scripts/check-package.mjs"
   },
   "keywords": [
     "mascot",
     "companion",
+    "otter",
     "three",
+    "threejs",
+    "webgl",
     "animation",
+    "spring-animation",
+    "svg-fallback",
+    "typescript",
     "liminal-hq"
   ],
   "license": "Apache-2.0 OR MIT",
