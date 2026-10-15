@@ -236,7 +236,6 @@
   <ellipse cx="-14" cy="-182.7" rx="22" ry="8" fill="#fff" opacity=".07" transform="rotate(-12 -14 -182.7)"/>
   <ellipse cx="0" cy="-144.3" rx="25.6" ry="17.3" fill="#d9b88c"/>
   <ellipse cx="0" cy="-145.9" rx="25.6" ry="17.3" fill="url(#gCream)" stroke="#fff" stroke-opacity=".25" stroke-width="1"/>
-  <ellipse cx="-30.7" cy="-148.5" rx="6.6" ry="4" fill="#e25d75" opacity=".85"/><ellipse cx="30.7" cy="-148.5" rx="6.6" ry="4" fill="#e25d75" opacity=".85"/>
   <g stroke="#6e4220" stroke-width="1" stroke-linecap="round" opacity=".75"><line x1="-47.8" y1="-148.5" x2="-23.8" y2="-148.5" transform="rotate(-2.3 -35.8 -148.5)"/><line x1="-47.8" y1="-143.4" x2="-23.8" y2="-143.4" transform="rotate(6.9 -35.8 -143.4)"/><line x1="23.8" y1="-148.5" x2="47.8" y2="-148.5" transform="rotate(2.3 35.8 -148.5)"/><line x1="23.8" y1="-143.4" x2="47.8" y2="-143.4" transform="rotate(-6.9 35.8 -143.4)"/></g>
   <ellipse cx="0" cy="-152.4" rx="7.9" ry="5.3" fill="#120b08"/>
   <ellipse cx="0" cy="-153.6" rx="7.7" ry="5.1" fill="#2a1a14"/>
