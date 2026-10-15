@@ -264,6 +264,11 @@ export function createMotion(options: MotionEngineOptions): Motion {
       else machine.request(mood);
       syncLayers();
     },
+    activity() {
+      if (!autoIdle) return;
+      machine.activity();
+      syncLayers();
+    },
     pet() {
       if (machine.mood === 'wave' || pet) return;
       pet = { startedAt: timeSeconds };
