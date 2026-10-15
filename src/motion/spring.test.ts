@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 import { describe, expect, it } from 'vitest';
-import { SpringChannel, smoothDamp } from './spring';
+import { SpringChannel, smoothDamp } from './spring.js';
 
 function simulate(hz: number, seconds: number, from: number, to: number, smoothTime: number) {
   let value = from;

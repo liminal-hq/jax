@@ -3,10 +3,10 @@
 // (c) Copyright 2026 Liminal HQ, Scott Morris
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-import { TRANSIENT_MOODS, type Jax, type JaxOptions, type Mood } from '../types';
-import { FALLBACK_CSS, FALLBACK_STYLE_ID } from './fallback.css';
+import { TRANSIENT_MOODS, type Jax, type JaxOptions, type Mood } from '../types.js';
+import { FALLBACK_CSS, FALLBACK_STYLE_ID } from './fallback.css.js';
 
-export { FALLBACK_CSS, FALLBACK_STYLE_ID } from './fallback.css';
+export { FALLBACK_CSS, FALLBACK_STYLE_ID } from './fallback.css.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 /** How long a transient mood plays before he settles back, in milliseconds. */

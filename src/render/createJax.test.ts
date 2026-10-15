@@ -6,8 +6,8 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BufferGeometry, Material, type Scene } from 'three';
-import { JaxUnavailableError, neutralPose, type Motion, type Mood } from '../types';
-import { createJax, MAX_DT, type JaxInternals, type RendererLike } from './createJax';
+import { JaxUnavailableError, neutralPose, type Motion, type Mood } from '../types.js';
+import { createJax, MAX_DT, type JaxInternals, type RendererLike } from './createJax.js';
 
 function makeScheduler() {
   let now = 0;

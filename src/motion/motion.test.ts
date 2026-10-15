@@ -4,9 +4,9 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 import { describe, expect, it } from 'vitest';
-import { MOODS, POSE_CHANNELS, type Mood, type Pose, type PoseChannel } from '../types';
-import { createMotion, type MotionEngineOptions } from './motion';
-import { defaultPatterns } from './patterns';
+import { MOODS, POSE_CHANNELS, type Mood, type Pose, type PoseChannel } from '../types.js';
+import { createMotion, type MotionEngineOptions } from './motion.js';
+import { defaultPatterns } from './patterns.js';
 
 function seeded(seed: number): () => number {
   let s = seed >>> 0;

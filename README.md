@@ -5,6 +5,7 @@
 </p>
 
 <p align="center">
+  <a href="https://www.npmjs.com/package/@liminal-hq/jax"><img src="https://img.shields.io/npm/v/@liminal-hq/jax?color=f97316" alt="npm version"></a>
   <img src="https://img.shields.io/badge/status-early%20development-f97316" alt="Status: early development">
   <img src="https://img.shields.io/badge/TypeScript-strict-3178c6" alt="TypeScript, strict">
   <img src="https://img.shields.io/badge/three.js-peer%20dependency-a78bfa" alt="three.js peer dependency">
@@ -18,7 +19,7 @@ Jax 🦦 is the Liminal HQ companion: a small 3D otter holding a book. He reacts
 
 ## Usage
 
-Install the package with `bun add @liminal-hq/jax three` — `three` is a peer dependency (version 0.160 or newer), so your app brings its own copy.
+Install the package with `bun add @liminal-hq/jax three` — `three` is a peer dependency (version 0.160 or newer, tested with 0.160 and 0.186), so your app brings its own copy. With npm, use `npm install @liminal-hq/jax three`.
 
 ```ts
 import { createJax } from '@liminal-hq/jax';

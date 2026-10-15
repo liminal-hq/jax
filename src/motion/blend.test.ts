@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 import { describe, expect, it } from 'vitest';
-import { Crossfade, clamp01, easeInOutCubic, easeOutBack, lerp, smootherstep } from './blend';
+import { Crossfade, clamp01, easeInOutCubic, easeOutBack, lerp, smootherstep } from './blend.js';
 
 const samples = Array.from({ length: 101 }, (_, i) => i / 100);
 

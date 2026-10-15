@@ -21,8 +21,8 @@ import {
   type Material,
   type Object3D
 } from 'three';
-import { POSE_CHANNELS, neutralPose, type Pose, type PoseChannel, type Skin } from '../types';
-import { ellipse, rect, ring, slab, triangle, createSlabCache, type SlabCache } from './slab';
+import { POSE_CHANNELS, neutralPose, type Pose, type PoseChannel, type Skin } from '../types.js';
+import { ellipse, rect, ring, slab, triangle, createSlabCache, type SlabCache } from './slab.js';
 
 export const PROP_NAMES = [
   'page',

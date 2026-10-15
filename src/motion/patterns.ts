@@ -3,9 +3,9 @@
 // (c) Copyright 2026 Liminal HQ, Scott Morris
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-import type { AnimationPattern, Mood, PatternContext, Pose } from '../types';
-import { smootherstep } from './blend';
-import { TRANSIENT_DURATION_MS } from './moodMachine';
+import type { AnimationPattern, Mood, PatternContext, Pose } from '../types.js';
+import { smootherstep } from './blend.js';
+import { TRANSIENT_DURATION_MS } from './moodMachine.js';
 
 // Channel conventions the patterns follow (the renderer maps them onto the model):
 // - Angles are radians. `*Raise` lifts an arm outwards and up (0 hangs, about 2.4 is overhead) and
