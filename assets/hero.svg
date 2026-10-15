@@ -7,10 +7,10 @@
     .ui { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
     .mono { font-family: ui-monospace, 'JetBrains Mono', 'Fira Code', Menlo, Consolas, monospace; }
     .m { animation-duration: 42s; animation-iteration-count: infinite; animation-timing-function: cubic-bezier(.45,0,.55,1); }
-    .cap, .wd, .pawL, .armL, .mug, .headMood, .page, .pawR, .rod, .line, .bobber, .pond, .ripples, .splash, .bang, .look, .hat, .hop, .confetti, .cf, .nap, .tailNap, .shade, .water, .eyesOpen, .eyesShut, .zz {
+    .cap, .wd, .book, .pawL, .armL, .mug, .headMood, .page, .pawR, .rod, .line, .bobber, .pond, .ripples, .splash, .bang, .look, .hat, .hop, .confetti, .cf, .nap, .tailNap, .shade, .water, .eyesOpen, .eyesShut, .zz {
       animation-duration: 42s; animation-iteration-count: infinite; animation-timing-function: cubic-bezier(.45,0,.55,1);
     }
-    .pawL { animation-name: pawL; } .armL { animation-name: armL; } .mug { animation-name: mug; }
+    .book { animation-name: book; } .pawL { animation-name: pawL; } .armL { animation-name: armL; } .mug { animation-name: mug; }
     .headMood { animation-name: headMood; } .page { animation-name: pageFlip; } .pawR { animation-name: pawR; }
     .rod { animation-name: rod; } .line { animation-name: line; } .bobber { animation-name: bobber; }
     .pond { animation-name: pond; } .ripples { animation-name: ripples; } .splash { animation-name: splash; } .bang { animation-name: bang; }
@@ -44,6 +44,7 @@
     @keyframes word4{0%{fill:#7c8796}65.83%{fill:#7c8796}67.74%{fill:#ffb454}82.26%{fill:#ffb454}84.17%{fill:#7c8796}100%{fill:#7c8796}}
     @keyframes cap5{0%{opacity:0;transform:translateY(5px)}82.5%{opacity:0;transform:translateY(5px)}84.4%{opacity:1;transform:translateY(0)}97.14%{opacity:1;transform:translateY(0)}99.05%{opacity:0;transform:translateY(-5px)}100%{opacity:0;transform:translateY(-5px)}}
     @keyframes word5{0%{fill:#7c8796}82.5%{fill:#7c8796}84.4%{fill:#ffb454}97.14%{fill:#ffb454}99.05%{fill:#7c8796}100%{fill:#7c8796}}
+    @keyframes book{0%{opacity:1;transform:translateY(0px) scale(1)}32.14%{opacity:1;transform:translateY(0px) scale(1)}33.33%{opacity:0;transform:translateY(12px) scale(.55)}98.1%{opacity:0;transform:translateY(12px) scale(.55)}99.52%{opacity:1;transform:translateY(0px) scale(1)}100%{opacity:1;transform:translateY(0px) scale(1)}}
     @keyframes pawL{0%{transform:translate(0px,0px) rotate(0deg)}33.57%{transform:translate(0px,0px) rotate(0deg)}35.48%{transform:translate(-9px,-3px) rotate(0deg)}39.52%{transform:translate(-9px,-3px) rotate(0deg)}41.67%{transform:translate(-5px,-20px) rotate(-14deg)}45%{transform:translate(-5px,-20px) rotate(-14deg)}47.14%{transform:translate(-9px,-3px) rotate(0deg)}48.33%{transform:translate(-9px,-3px) rotate(0deg)}50.24%{transform:translate(0px,0px) rotate(0deg)}100%{transform:translate(0px,0px) rotate(0deg)}}
     @keyframes armL{0%{transform:rotate(0deg)}33.57%{transform:rotate(0deg)}35.48%{transform:rotate(9deg)}39.52%{transform:rotate(9deg)}41.67%{transform:rotate(26deg)}45%{transform:rotate(26deg)}47.14%{transform:rotate(9deg)}48.33%{transform:rotate(9deg)}50.24%{transform:rotate(0deg)}100%{transform:rotate(0deg)}}
     @keyframes mug{0%{opacity:0;transform:translateY(10px)}33.57%{opacity:0;transform:translateY(10px)}35.48%{opacity:1;transform:translateY(0)}48.57%{opacity:1;transform:translateY(0)}50%{opacity:0;transform:translateY(8px)}100%{opacity:0;transform:translateY(8px)}}
@@ -216,7 +217,7 @@
     <ellipse cx="0" cy="-67.6" rx="32" ry="46" fill="#d9b88c"/><ellipse cx="0" cy="-69.1" rx="32" ry="46" fill="url(#gCream)" stroke="#fff" stroke-opacity=".2" stroke-width="1"/>
     <g class="armL" style="transform-origin:-35.2px -109.4px"><g transform="rotate(-23 -27.5 -87.7)"><ellipse cx="-29.7" cy="-88.3" rx="10.2" ry="26.9" fill="#a78bfa" opacity=".55"/><ellipse cx="-26.3" cy="-85.3" rx="10.2" ry="26.9" fill="#8f5629"/><ellipse cx="-27.5" cy="-87.7" rx="10.2" ry="26.9" fill="url(#gFur)" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/></g></g>
     <g class="armR"><g transform="rotate(23 27.5 -87.7)"><ellipse cx="28.7" cy="-85.3" rx="10.2" ry="26.9" fill="#8f5629"/><ellipse cx="27.5" cy="-87.7" rx="10.2" ry="26.9" fill="url(#gFur)" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/></g></g>
-    <g>
+    <g class="book" style="transform-origin:0px -60px">
   <rect x="-37" y="-101.9" width="70" height="44" rx="3" fill="#a78bfa" opacity=".55"/>
   <rect x="-33.8" y="-98.8" width="70" height="44" rx="3" fill="#a3334b"/>
   <rect x="-35" y="-101.4" width="70" height="44" rx="3" fill="url(#gBook)" stroke="#fff" stroke-opacity=".18" stroke-width="1"/>
@@ -254,13 +255,13 @@
 </g></g>
     <g class="pawL"><g class="mug" opacity="0">
   <g class="steamA" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8">
-    <path class="st" d="M-42 -93q-3 -5 0 -10t0 -10"/>
-    <path class="st st2" d="M-35 -94q3 -5 0 -10t0 -10"/>
+    <path class="st" d="M-22 -88q-3 -5 0 -10t0 -10"/>
+    <path class="st st2" d="M-15 -89q3 -5 0 -10t0 -10"/>
   </g>
-  <path d="M-55 -84a6.5 6.5 0 1 0 0 13" fill="none" stroke="#4fa9b8" stroke-width="3.6"/>
-  <rect x="-48.8" y="-86.8" width="22" height="25" rx="4" fill="#3f8f9c"/>
-  <rect x="-50" y="-89" width="22" height="25" rx="4" fill="url(#gMug)" stroke="#fff" stroke-opacity=".25" stroke-width="1"/>
-  <ellipse cx="-39" cy="-87" rx="8.5" ry="2" fill="#7a4b2a"/>
+  <path d="M-8 -79a6.5 6.5 0 1 1 0 13" fill="none" stroke="#4fa9b8" stroke-width="3.6"/>
+  <rect x="-27.8" y="-81.8" width="22" height="25" rx="4" fill="#3f8f9c"/>
+  <rect x="-29" y="-84" width="22" height="25" rx="4" fill="url(#gMug)" stroke="#fff" stroke-opacity=".25" stroke-width="1"/>
+  <ellipse cx="-18" cy="-82" rx="8.5" ry="2" fill="#7a4b2a"/>
 </g><g><ellipse cx="-16.7" cy="-62.2" rx="9.6" ry="7.7" fill="#6e4220"/><ellipse cx="-17.9" cy="-64.6" rx="9.6" ry="7.7" fill="url(#gDark)" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/></g></g>
     <g class="pawR"><g class="rod" style="transform-origin:17.9px -64.6px" opacity="0">
   <line x1="9.9" y1="-54.6" x2="115.9" y2="-144.6" stroke="#6e4220" stroke-width="4.2" stroke-linecap="round"/>
