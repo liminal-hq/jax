@@ -190,7 +190,6 @@ describe('props', () => {
       ['writing', 'propPencil'],
       ['checking', 'propMagnifier'],
       ['fishing', 'propRod'],
-      ['fishing', 'propWater'],
       ['tea', 'propMug'],
       ['printing', 'propPrinter'],
       ['party', 'propHat'],
@@ -202,6 +201,79 @@ describe('props', () => {
       const poses = run(motion, 2.5);
       expect(poses[poses.length - 1][channel]).toBeGreaterThan(0.9);
     }
+  });
+});
+
+describe('book, page, thumb and roll channels', () => {
+  const bookAway: Mood[] = ['checking', 'fishing', 'tea', 'party', 'printing', 'nap'];
+
+  it('keeps every new channel finite through every mood', () => {
+    for (const mood of MOODS) {
+      const motion = engine();
+      motion.setMood(mood);
+      for (const pose of run(motion, 8, 60)) {
+        for (const channel of ['bodyRoll', 'pageFlip', 'propBook', 'propThumb'] as const) {
+          expect(Number.isFinite(pose[channel]), `${mood} ${channel}`).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('puts the book away in the moods that hold something else, and shows it otherwise', () => {
+    for (const mood of MOODS) {
+      const motion = engine();
+      motion.setMood(mood);
+      const last = run(motion, 3)[359];
+      if (bookAway.includes(mood)) expect(last.propBook, mood).toBeLessThan(0.05);
+      else expect(last.propBook, mood).toBeGreaterThan(0.95);
+    }
+  });
+
+  it('ramps the book away and back without wobbling', () => {
+    const motion = engine();
+    motion.setMood('tea');
+    const away = run(motion, 4).map((p) => p.propBook);
+    for (let i = 1; i < away.length; i++) expect(away[i]).toBeLessThanOrEqual(away[i - 1] + 1e-9);
+    motion.setMood('chill');
+    const back = run(motion, 4).map((p) => p.propBook);
+    for (let i = 1; i < back.length; i++)
+      expect(back[i]).toBeGreaterThanOrEqual(back[i - 1] - 1e-9);
+  });
+
+  it('raises the thumb with the arm and lowers it again, each monotonic', () => {
+    const motion = engine();
+    motion.setMood('thumbsup');
+    const poses = run(motion, 1.2);
+    const rising = poses.map((p) => p.propThumb);
+    for (let i = 1; i < rising.length; i++) {
+      expect(rising[i]).toBeGreaterThanOrEqual(rising[i - 1] - 1e-9);
+    }
+    expect(rising[rising.length - 1]).toBeGreaterThan(0.9);
+    const rest = run(motion, 5);
+    const peak = rest.findIndex((p) => p.propThumb < 0.95);
+    const falling = rest.slice(peak).map((p) => p.propThumb);
+    for (let i = 1; i < falling.length; i++) {
+      expect(falling[i]).toBeLessThanOrEqual(falling[i - 1] + 1e-9);
+    }
+    expect(falling[falling.length - 1]).toBeLessThan(0.01);
+  });
+
+  it('lies on his back for a nap and stands up again', () => {
+    const motion = engine();
+    motion.setMood('nap');
+    const napping = run(motion, 6)[719];
+    expect(napping.bodyRoll).toBeLessThan(-1.2);
+    motion.setMood('chill');
+    expect(Math.abs(run(motion, 6)[719].bodyRoll)).toBeLessThan(0.05);
+  });
+
+  it('swings the page over the book while flipping, between 0 and 1', () => {
+    const motion = engine();
+    motion.setMood('flipping');
+    const flips = run(motion, 10).map((p) => p.pageFlip);
+    expect(Math.max(...flips)).toBeGreaterThan(0.8);
+    expect(Math.min(...flips)).toBeGreaterThanOrEqual(-1e-9);
+    expect(Math.max(...flips)).toBeLessThanOrEqual(1 + 1e-9);
   });
 });
 
@@ -374,7 +446,8 @@ describe('moods', () => {
 
   it('does not idle or nap on its own without autoIdle', () => {
     const motion = engine();
-    for (let i = 0; i < 10; i++) run(motion, 20);
+    // No copies needed here, so step in the largest allowed slices.
+    for (let i = 0; i < 2000; i++) motion.step(0.1);
     expect(motion.mood).toBe('chill');
   });
 

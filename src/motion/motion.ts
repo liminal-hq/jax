@@ -42,11 +42,6 @@ const BASE_SCALE: Partial<Record<Mood, number>> = { nap: 0.35, party: 0.5 };
 const ANGLE_CHANNELS: readonly PoseChannel[] = ['bodyYaw', 'headYaw'];
 
 export interface MotionEngineOptions extends MotionOptions {
-  /**
-   * Let the engine rotate through idle moods (chill, flipping, fishing, tea) after quiet, and nap
-   * after 45 s. Off by default: the host decides the mood with `setMood`.
-   */
-  autoIdle?: boolean;
   /** Crossfade time for patterns that do not set `blendInMs`, in milliseconds. Default 500. */
   blendInMs?: number;
   /** Overrides for the mood machine behind `autoIdle` and transient return. */
