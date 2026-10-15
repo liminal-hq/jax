@@ -6,15 +6,17 @@
 import { PerspectiveCamera, Scene, WebGLRenderer, type Camera } from 'three';
 import { defaultSkin } from '../model/defaultSkin';
 import { buildOtter, type OtterRig } from '../model/otter';
+import { createMotion } from '../motion/motion';
+import { defaultPatterns } from '../motion/patterns';
 import {
   JaxUnavailableError,
+  neutralPose,
   type Jax,
   type JaxOptions,
   type Mood,
   type Motion,
   type MotionOptions
 } from '../types';
-import { createStubMotion } from './stubMotion';
 import { ensureSizeRule, sizeClass } from './sizeStyle';
 
 /** The part of a renderer the loop needs. `WebGLRenderer` satisfies it. */
@@ -103,10 +105,14 @@ export async function createJax(
 
   const mediaQuery = win?.matchMedia?.('(prefers-reduced-motion: reduce)') ?? null;
   let reduced = options.reducedMotion ?? mediaQuery?.matches ?? false;
-  const motion = (internal.createMotion ?? createStubMotion)({
-    patterns: options.patterns ?? [],
-    reducedMotion: reduced
+  const patterns = options.patterns?.length ? options.patterns : defaultPatterns;
+  const motion = (internal.createMotion ?? createMotion)({
+    patterns,
+    reducedMotion: reduced,
+    autoIdle: options.autoIdle ?? true
   });
+  // The motion engine reuses the pose it returns, so the rig draws from this copy
+  const drawn = neutralPose();
 
   let disposed = false;
   let contextLost = false;
@@ -119,7 +125,8 @@ export async function createJax(
   const canRender = () => !disposed && !contextLost && onScreen && documentVisible;
 
   function draw(dt: number): void {
-    rig.apply(motion.step(dt));
+    Object.assign(drawn, motion.step(dt));
+    rig.apply(drawn);
     rig.update(dt);
     renderer.render(scene, camera);
   }

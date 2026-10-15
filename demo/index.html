@@ -79,6 +79,9 @@
         max-width: 100%;
         overflow: hidden;
       }
+      .readout {
+        font-variant-numeric: tabular-nums;
+      }
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -113,6 +116,7 @@
         <p>The Liminal HQ otter, as a small 3D companion. Pick a mood, or let him drift.</p>
       </header>
       <div class="controls" id="controls"></div>
+      <p class="readout" id="smoothness" aria-live="off">Smoothness: measuring…</p>
       <div class="chips" id="chips"></div>
       <div class="stage" id="hero"></div>
       <div class="grid" id="grid"></div>

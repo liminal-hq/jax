@@ -6,3 +6,5 @@
 export * from './types';
 export { createJax } from './render/createJax';
 export { defaultSkin } from './model/defaultSkin';
+export { createMotion, createMoodMachine, defaultPatterns } from './motion';
+export type { MotionEngineOptions, MoodMachine, MoodMachineOptions } from './motion';

@@ -34,11 +34,32 @@ export const IDLE_ROTATION: readonly Mood[] = ['chill', 'flipping', 'fishing', '
  * Every animated number. Angles are radians, offsets are model units (the torso is about 2 units
  * tall), and the `prop*` channels are presence from 0 (hidden) to 1 (fully shown), which the
  * renderer turns into an enter or exit tween so props never pop.
+ *
+ * Sign conventions, shared by the motion engine and the renderer:
+ *
+ * - `bodyBob`: vertical float in model units, positive is up. `bodyLift` is a larger vertical offset
+ *   with the same sign.
+ * - `bodySquash`: positive squashes (shorter and wider), negative stretches.
+ * - `bodyYaw`, `headYaw`: turn about the vertical axis, positive turns towards his left (the
+ *   viewer's right). They are not wrapped: a spin may take them past plus or minus pi.
+ * - `bodyRoll`: lean about the front-to-back axis. Zero is upright and about -pi/2 is lying on his
+ *   back, as for a nap.
+ * - `headPitch`: positive nods down. `headRoll`: tilts the head sideways.
+ * - `armLRaise`, `armRRaise`: positive lifts the arm outwards and up, with the same sign for both
+ *   arms (the renderer mirrors the left). Zero hangs at his side and about 2.4 is overhead.
+ * - `armLForward`, `armRForward`: positive swings the arm towards the viewer.
+ * - `tail`: sway of the tail about the vertical axis.
+ * - `eyeOpen`: 1 is open, 0 is shut.
+ * - `lookX`, `lookY`: where the eyes glance, positive is right and up as the viewer sees it.
+ * - `pageFlip`: 0 to 1 swing of the loose page across the book.
+ * - `propBook` is presence of the book he holds and is 1 at rest. `propThumb` is presence of the
+ *   raised thumb. The other `prop*` channels are presence of one prop each.
  */
 export const POSE_CHANNELS = [
   'bodyBob',
   'bodySquash',
   'bodyYaw',
+  'bodyRoll',
   'bodyLift',
   'headYaw',
   'headPitch',
@@ -51,7 +72,10 @@ export const POSE_CHANNELS = [
   'eyeOpen',
   'lookX',
   'lookY',
+  'pageFlip',
+  'propBook',
   'propPage',
+  'propThumb',
   'propRod',
   'propMug',
   'propPencil',
@@ -72,10 +96,12 @@ export const PROP_CHANNELS: readonly PoseChannel[] = POSE_CHANNELS.filter((c) =>
   c.startsWith('prop')
 );
 
-/** The resting pose: eyes open, everything else at zero. */
+/** The resting pose: eyes open and the book showing, everything else at zero. */
 export function neutralPose(): Pose {
   const pose = {} as Pose;
-  for (const channel of POSE_CHANNELS) pose[channel] = channel === 'eyeOpen' ? 1 : 0;
+  for (const channel of POSE_CHANNELS) {
+    pose[channel] = channel === 'eyeOpen' || channel === 'propBook' ? 1 : 0;
+  }
   return pose;
 }
 
@@ -128,7 +154,16 @@ export interface Skin {
   /** Which props this skin allows. Missing means allowed. */
   props?: Partial<
     Record<
-      'page' | 'rod' | 'mug' | 'pencil' | 'magnifier' | 'printer' | 'hat' | 'confetti' | 'water',
+      | 'page'
+      | 'thumb'
+      | 'rod'
+      | 'mug'
+      | 'pencil'
+      | 'magnifier'
+      | 'printer'
+      | 'hat'
+      | 'confetti'
+      | 'water',
       boolean
     >
   >;
@@ -143,6 +178,12 @@ export interface JaxOptions {
   fps?: number;
   /** Cap on the device pixel ratio. Default 2. */
   maxDpr?: number;
+  /**
+   * Let him drift between idle moods (chill, flipping, fishing, tea) when nothing is happening, and
+   * nap after a long quiet. A mood set with `setMood` is held until the next one. Default `true`;
+   * pass `false` to keep him on exactly the mood the app sets.
+   */
+  autoIdle?: boolean;
   /** Start with reduced motion on. The renderer also follows the system setting. */
   reducedMotion?: boolean;
   /** A class for the canvas element, so apps style it without inline styles. */
@@ -174,6 +215,11 @@ export interface MotionOptions {
   patterns: readonly AnimationPattern[];
   random?: () => number;
   reducedMotion?: boolean;
+  /**
+   * Rotate through the idle moods after quiet, and nap after 45 s. Off by default for the engine:
+   * the host decides the mood with `setMood`. `createJax` turns it on unless told otherwise.
+   */
+  autoIdle?: boolean;
 }
 
 /** Thrown when there is no WebGL, or the context is lost for good. Apps show the fallback. */

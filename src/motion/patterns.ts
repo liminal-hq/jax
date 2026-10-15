@@ -13,7 +13,9 @@ import { TRANSIENT_DURATION_MS } from './moodMachine';
 // - `headPitch` is positive when tipped down, `lookY` is positive when looking up.
 // - `bodySquash` is positive when squashed (shorter and wider), negative when stretched.
 // - `bodyLift` is a vertical offset in model units; `bodyBob` is the small breathing float.
-// - Prop channels are presence from 0 to 1.
+// - `bodyRoll` is zero upright and about -pi/2 lying on his back. `pageFlip` swings the loose page over the book.
+// - Prop channels are presence from 0 to 1. `propBook` is 1 at rest, so a pattern that puts the book
+//   away sets it to 0 and one that does not mention it keeps the book showing.
 // Base-layer motion (breathing, micro-sway, blinks, gaze drift) belongs to the engine, so patterns
 // only describe what is particular to the mood.
 
@@ -72,10 +74,12 @@ const chill = pattern(
 const FLIP_PERIOD = 2.4;
 const flipping = pattern(
   'flipping',
-  { headPitch: READING_PITCH, propPage: 1, lookY: -0.3 },
+  { headPitch: READING_PITCH, propPage: 1, pageFlip: 0, lookY: -0.3 },
   (t) => {
     const c = cycle(t, FLIP_PERIOD) / FLIP_PERIOD;
     const lift = window(c, 0.18, 0.3, 0.75, 0.87);
+    // The page swings over while the paw is up and swings back as it lowers.
+    const flip = bump(c, 0.2, 0.85);
     return {
       headPitch: READING_PITCH + 0.03 * lift,
       headRoll: 0.03 * osc(t, 8.3),
@@ -85,6 +89,7 @@ const flipping = pattern(
       armLRaise: 0.25 * lift,
       tail: 0.2 * osc(t, 3.1),
       propPage: 1,
+      pageFlip: flip,
       lookY: -0.3
     };
   }
@@ -113,7 +118,7 @@ const writing = pattern(
 
 const checking = pattern(
   'checking',
-  { headPitch: 0.05, armRRaise: 1, armRForward: 0.3, propMagnifier: 1 },
+  { headPitch: 0.05, armRRaise: 1, armRForward: 0.3, propMagnifier: 1, propBook: 0 },
   (t) => {
     const sweep = osc(t, 5.2);
     return {
@@ -125,6 +130,7 @@ const checking = pattern(
       armRRaise: 1 + 0.3 * osc(t, 2.6),
       armRForward: 0.3,
       propMagnifier: 1,
+      propBook: 0,
       tail: 0.15 * osc(t, 3.3)
     };
   },
@@ -134,7 +140,7 @@ const checking = pattern(
 const FISH_PERIOD = 7;
 const fishing = pattern(
   'fishing',
-  { bodyYaw: -0.3, armRRaise: 0.45, headRoll: -0.08, propRod: 1, propWater: 1 },
+  { bodyYaw: -0.3, armRRaise: 0.45, headRoll: -0.08, propRod: 1, propBook: 0 },
   (t) => {
     const c = cycle(t, FISH_PERIOD);
     // Cast, float, bite, reel in. Every term is zero at both ends of the cycle.
@@ -149,7 +155,7 @@ const fishing = pattern(
       armRRaise: 0.45 + 0.08 * osc(t, 4.8) + 0.35 * bite + swing + 0.5 * reel,
       armRForward: 0.3 + 0.15 * reel,
       propRod: 1,
-      propWater: 1,
+      propBook: 0,
       tail: 0.15 * osc(t, 3.7)
     };
   },
@@ -159,7 +165,7 @@ const fishing = pattern(
 const TEA_PERIOD = 5;
 const tea = pattern(
   'tea',
-  { armLRaise: 0.3, propMug: 1, headPitch: 0.05 },
+  { armLRaise: 0.3, propMug: 1, propBook: 0, headPitch: 0.05 },
   (t) => {
     const c = cycle(t, TEA_PERIOD);
     const sip = window(c, 0.1, 0.55, 1.0, 1.45);
@@ -169,6 +175,7 @@ const tea = pattern(
       headPitch: 0.05 - 0.17 * sip,
       headRoll: 0.03 * osc(t, 8.3),
       propMug: 1,
+      propBook: 0,
       tail: 0.2 * osc(t, 3.3)
     };
   },
@@ -193,12 +200,13 @@ const wave = pattern(
 
 const thumbsup = pattern(
   'thumbsup',
-  { armRRaise: 1.8, headRoll: 0.12 },
+  { armRRaise: 1.8, headRoll: 0.12, propThumb: 1 },
   (t) => {
     const arm = window(t, 0, 0.5, 2.0, 2.6);
     return {
       armRRaise: 1.5 * arm + 0.3 * ramp(t, 0, 0.25) * (1 - ramp(t, 2.0, 2.6)),
       armRForward: 0.2 * arm,
+      propThumb: ramp(t, 0.3, 0.7) * (1 - ramp(t, 1.9, 2.3)),
       headRoll: 0.12 * arm,
       bodyBob: 0.04 * bump(t, 0.3, 0.9),
       tail: 0.35 * arm * osc(t, 0.8)
@@ -223,17 +231,22 @@ const stuck = pattern(
   { durationMs: TRANSIENT_DURATION_MS.stuck, blendInMs: 450, smoothTime: { armRRaise: 0.05 } }
 );
 
-const printing = pattern('printing', { headPitch: 0.25, propPrinter: 1, lookY: -0.3 }, (t) => ({
-  headPitch: 0.25 + 0.02 * osc(t, 1.8),
-  headRoll: 0.03 * osc(t, 7.1),
-  lookY: -0.3,
-  propPrinter: 1,
-  tail: 0.12 * osc(t, 3.4)
-}));
+const printing = pattern(
+  'printing',
+  { headPitch: 0.25, propPrinter: 1, propBook: 0, lookY: -0.3 },
+  (t) => ({
+    headPitch: 0.25 + 0.02 * osc(t, 1.8),
+    headRoll: 0.03 * osc(t, 7.1),
+    lookY: -0.3,
+    propPrinter: 1,
+    propBook: 0,
+    tail: 0.12 * osc(t, 3.4)
+  })
+);
 
 const party = pattern(
   'party',
-  { armLRaise: 2.2, armRRaise: 2.2, propHat: 1, propConfetti: 1 },
+  { armLRaise: 2.2, armRRaise: 2.2, propHat: 1, propConfetti: 1, propBook: 0 },
   (t) => {
     // Anticipation squat, then a hop with one full spin, then a soft landing.
     const hop = Math.min(1, Math.max(0, (t - 0.55) / 1.4));
@@ -248,6 +261,7 @@ const party = pattern(
       armLRaise: 2.2 * arms + 0.15 * osc(t, 0.8) * arms,
       armRRaise: 2.2 * arms - 0.15 * osc(t, 0.8) * arms,
       propHat: 1,
+      propBook: 0,
       propConfetti: ramp(t, 0.7, 1.1),
       tail: 0.5 * osc(t, 0.5) * arms
     };
@@ -260,22 +274,36 @@ const party = pattern(
 );
 
 const NAP_SLOW = 0.35;
+/** Lying on his back: a quarter turn, a touch short of flat so the belly tilts to the viewer. */
+const NAP_ROLL = -Math.PI / 2 + Math.PI * 0.04;
 const nap = pattern(
   'nap',
-  { bodyLift: -0.55, headRoll: 0.1, armLRaise: 0.5, armRRaise: 0.5, eyeOpen: 0.06, propWater: 1 },
+  {
+    bodyRoll: NAP_ROLL,
+    bodyLift: 0,
+    headRoll: 0.1,
+    armLRaise: 0.5,
+    armRRaise: 0.5,
+    eyeOpen: 0.06,
+    propWater: 1,
+    propBook: 0
+  },
   (t) => ({
-    bodyLift: -0.55 + 0.06 * osc(t, 7),
+    bodyRoll: NAP_ROLL + 0.03 * osc(t, 8.6),
+    bodyLift: 0.06 * osc(t, 7),
     bodySquash: 0.02 * osc(t, 5),
     headRoll: 0.1 + 0.02 * osc(t, 9),
     armLRaise: 0.5,
     armRRaise: 0.5,
     eyeOpen: 0.06,
     propWater: 1,
+    propBook: 0,
     tail: 0.15 * osc(t, 7.8)
   }),
   {
     blendInMs: 1400,
     smoothTime: {
+      bodyRoll: 0.6,
       bodyLift: NAP_SLOW,
       bodySquash: NAP_SLOW,
       headRoll: NAP_SLOW,

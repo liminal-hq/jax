@@ -33,6 +33,23 @@ describe('the contract', () => {
     expect(PROP_CHANNELS).not.toContain('tail');
   });
 
+  it('carries the book, page, thumb and roll channels', () => {
+    for (const channel of ['bodyRoll', 'pageFlip', 'propBook', 'propThumb'] as const) {
+      expect(POSE_CHANNELS).toContain(channel);
+    }
+    expect(PROP_CHANNELS).toContain('propBook');
+    expect(PROP_CHANNELS).toContain('propThumb');
+    expect(PROP_CHANNELS).not.toContain('pageFlip');
+    expect(PROP_CHANNELS).not.toContain('bodyRoll');
+  });
+
+  it('shows the book at rest and nothing else', () => {
+    const pose = neutralPose();
+    expect(pose.propBook).toBe(1);
+    const others = PROP_CHANNELS.filter((c) => c !== 'propBook').map((c) => pose[c]);
+    expect(others.every((v) => v === 0)).toBe(true);
+  });
+
   it('keeps transient, sustained and idle moods inside the mood list and apart', () => {
     for (const mood of [...TRANSIENT_MOODS, ...SUSTAINED_MOODS, ...IDLE_ROTATION]) {
       expect(MOODS).toContain(mood);

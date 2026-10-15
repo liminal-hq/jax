@@ -26,6 +26,7 @@ import { ellipse, rect, ring, slab, triangle, createSlabCache, type SlabCache } 
 
 export const PROP_NAMES = [
   'page',
+  'thumb',
   'rod',
   'mug',
   'pencil',
@@ -38,9 +39,13 @@ export const PROP_NAMES = [
 
 export type PropName = (typeof PROP_NAMES)[number];
 
-/** The pose channel that drives each prop's presence. */
+/**
+ * The pose channel that drives each prop's presence. The book he holds is not a prop: it has its
+ * own channel, `propBook`, and is shown at rest.
+ */
 export const PROP_CHANNEL: Record<PropName, PoseChannel> = {
   page: 'propPage',
+  thumb: 'propThumb',
   rod: 'propRod',
   mug: 'propMug',
   pencil: 'propPencil',
@@ -76,6 +81,7 @@ export interface OtterRig {
 
 const BASE_Y = 0.55;
 const FEET_Y = -2.2;
+/** The `bodyRoll` at which he lies fully on his back, as a nap does. */
 const LIE_ANGLE = -Math.PI / 2 + Math.PI * 0.04;
 const PAW: readonly [number, number, number] = [-0.27, -0.7, 0.42];
 const FISH_ORIGIN = new Vector3(1.55, -2.4, 0.65);
@@ -299,7 +305,7 @@ export function buildOtter(skin: Skin): OtterRig {
   };
   const tagged = (name: PropName, opacity = 1) => ({ tag: name, opacity });
 
-  // Page: turns across the book as its presence rises
+  // Page: a loose page that swings across the book with `pageFlip`
   const page = makeProp('page', book);
   page.position.set(0, 0, 0.1);
   if (allowed('page')) {
@@ -361,6 +367,34 @@ export function buildOtter(skin: Skin): OtterRig {
     });
     lead.rotation.z = Math.PI;
     pencil.add(lead);
+  }
+
+  // Thumb, raised from the right paw: it points along the arm's local +x, which is upright once the
+  // arm is lifted out to the side
+  const thumb = makeProp('thumb', armR);
+  thumb.position.set(...PAW);
+  if (allowed('thumb')) {
+    const m = tagged('thumb');
+    thumb.add(
+      slab(cache, {
+        shape: ellipse(0.2, 0.1),
+        depth: 0.24,
+        colour: c.fur,
+        position: [0.14, 0.02, 0],
+        bevel: 0.03,
+        material: m
+      })
+    );
+    thumb.add(
+      slab(cache, {
+        shape: ellipse(0.07, 0.06),
+        depth: 0.2,
+        colour: c.furDark,
+        position: [0.34, 0.02, 0],
+        bevel: 0.02,
+        material: m
+      })
+    );
   }
 
   // Magnifying glass, right paw
@@ -706,31 +740,26 @@ export function buildOtter(skin: Skin): OtterRig {
   function apply(pose: Readonly<Pose>): void {
     for (const channel of POSE_CHANNELS) presence[channel] = pose[channel];
 
-    // A prop that is present puts the book away; the water also lays him on his back
-    const bookAway = Math.max(
-      clamp01(pose.propRod),
-      clamp01(pose.propMug),
-      clamp01(pose.propMagnifier),
-      clamp01(pose.propPrinter),
-      clamp01(pose.propHat),
-      clamp01(pose.propWater)
-    );
-    const bookIn = 1 - bookAway;
-    book.visible = bookIn > 0.001;
-    book.scale.setScalar(Math.max(bookIn, 0.001));
+    // The book has its own presence: it shrinks away rather than popping out
+    const bookIn = clamp01(pose.propBook);
+    book.visible = bookIn > 0;
+    book.scale.setScalar(Math.max(easeOutBack(bookIn), 0.001));
 
-    const lie = clamp01(pose.propWater);
+    // Lying on his back raises the offsets that float him on the water
+    const lie = clamp01(pose.bodyRoll / LIE_ANGLE);
     const squashY = 1 - pose.bodySquash;
     const squashXZ = 1 + pose.bodySquash * 0.5;
     body.scale.set(squashXZ, squashY, squashXZ);
     body.position.set(
-      0.15 * lie,
+      0.55 * lie,
       BASE_Y - 1.1 * lie + pose.bodyBob + pose.bodyLift - FEET_Y * (squashY - 1),
       0
     );
-    body.rotation.set(-0.2 * lie, pose.bodyYaw, LIE_ANGLE * lie);
+    // Yaw is in radians and may be past a full turn after a spin: the rotation takes it as it is
+    body.rotation.set(-0.2 * lie, pose.bodyYaw, pose.bodyRoll);
 
     head.rotation.set(pose.headPitch, pose.headYaw, pose.headRoll);
+    // Both arms hang from the shoulder and lift outwards for a positive raise, so the left is mirrored
     armL.rotation.set(-pose.armLForward, 0, -pose.armLRaise);
     armR.rotation.set(-pose.armRForward, 0, pose.armRRaise);
     tail.rotation.y = pose.tail;
@@ -743,8 +772,8 @@ export function buildOtter(skin: Skin): OtterRig {
       object.visible = p > 0;
       if (scales) object.scale.setScalar(easeOutBack(p));
     }
-    // The page turns across the book as its presence rises
-    page.rotation.y = -Math.PI * clamp01(pose.propPage);
+    // The page swings across the book as `pageFlip` runs from 0 to 1
+    page.rotation.y = -Math.PI * clamp01(pose.pageFlip);
 
     for (const name of PROP_NAMES) {
       const fade = Math.min(1, clamp01(pose[PROP_CHANNEL[name]]) * 2);
