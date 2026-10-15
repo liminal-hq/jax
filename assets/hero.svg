@@ -31,6 +31,7 @@
     .horizon { animation: horizon 8s cubic-bezier(.45,0,.55,1) infinite; }
     .tw { animation: twinkle 3.2s ease-in-out infinite; }
     .mt { animation: mote 10s linear infinite; }
+    .shimmer { animation: shimmer 7s cubic-bezier(.45,0,.55,1) infinite; }
     .rp { animation: ripple 2.2s ease-out infinite; } .rp2 { animation-delay: -1.1s; }
     @keyframes cap0{0%{opacity:1;transform:translateY(0)}15.6%{opacity:1;transform:translateY(0)}17.5%{opacity:0;transform:translateY(-5px)}98.1%{opacity:0;transform:translateY(5px)}100%{opacity:1;transform:translateY(0)}}
     @keyframes word0{0%{fill:#ffb454}15.6%{fill:#ffb454}17.5%{fill:#7c8796}98.1%{fill:#7c8796}100%{fill:#ffb454}}
@@ -84,6 +85,7 @@
     @keyframes horizon{0%{opacity:0.65}50%{opacity:1}100%{opacity:0.65}}
     @keyframes twinkle{0%{opacity:0.12}50%{opacity:0.85}100%{opacity:0.12}}
     @keyframes mote{0%{opacity:0;transform:translate(0px,0px)}20%{opacity:.75;transform:translate(4px,-22px)}70%{opacity:.5;transform:translate(-6px,-70px)}100%{opacity:0;transform:translate(3px,-104px)}}
+    @keyframes shimmer{0%{transform:translateX(0px)}55%{transform:translateX(190px)}100%{transform:translateX(190px)}}
     @keyframes ripple{0%{opacity:.8;transform:scale(.4)}100%{opacity:0;transform:scale(1.6)}}
     @keyframes cf0{0%{transform:translate(0px,0px) rotate(0deg) scale(.4)}68.93%{transform:translate(0px,0px) rotate(0deg) scale(.4)}70.24%{transform:translate(102.2px,-24.6px) rotate(94.6deg) scale(1)}76.31%{transform:translate(116.8px,70.4px) rotate(227deg) scale(1)}82.39%{transform:translate(119.1px,186.5px) rotate(378.3deg) scale(1)}100%{transform:translate(119.1px,186.5px) rotate(378.3deg) scale(1)}}
     @keyframes cf1{0%{transform:translate(0px,0px) rotate(0deg) scale(.4)}69.19%{transform:translate(0px,0px) rotate(0deg) scale(.4)}70.5%{transform:translate(71.1px,-63.8px) rotate(-134.3deg) scale(1)}76.49%{transform:translate(74px,37.9px) rotate(-322.4deg) scale(1)}82.49%{transform:translate(98.4px,162.1px) rotate(-537.3deg) scale(1)}100%{transform:translate(98.4px,162.1px) rotate(-537.3deg) scale(1)}}
@@ -165,6 +167,9 @@
       <feGaussianBlur stdDeviation="4" result="blur"/>
       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
+    <linearGradient id="gSwoosh" x1="0" y1="0" x2="1" y2="0.3"><stop offset="0" stop-color="#b8743a"/><stop offset=".55" stop-color="#a0612f"/><stop offset="1" stop-color="#8a5428"/></linearGradient>
+    <linearGradient id="gShimmer" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffb454" stop-opacity="0"/><stop offset=".5" stop-color="#ffd8a0" stop-opacity=".75"/><stop offset="1" stop-color="#ffb454" stop-opacity="0"/></linearGradient>
+    <clipPath id="swooshClip"><path d="M85 173.2C112 169.4 150 178.6 214 167.6C160 183.6 118 185 87 182.4Q79.8 177.8 85 173.2Z"/></clipPath>
     <clipPath id="frame"><rect width="1200" height="320" rx="18"/></clipPath>
   </defs>
 
@@ -326,12 +331,13 @@
     <!-- the lit face, with a soft bevel edge -->
     <text x="78" y="146" fill="url(#otter)" stroke="#fff" stroke-opacity=".16" stroke-width="1">jax</text>
   </g>
-  <!-- his crimson book, as an underline: cover, pages, spine -->
+  <!-- otter-tail swoosh under the name, a slow amber shimmer gliding along it -->
   <g>
-    <rect x="84.6" y="173.8" width="62" height="7" rx="2" fill="#a3334b"/>
-    <rect x="83" y="172" width="62" height="7" rx="2" fill="url(#gBook)"/>
-    <rect x="86" y="173.8" width="56" height="2.4" rx="1" fill="#fbfaf6" opacity=".9"/>
-    <rect x="113.4" y="172" width="1.2" height="7" fill="#8a5428" opacity=".7"/>
+    <path d="M85 173.2C112 169.4 150 178.6 214 167.6C160 183.6 118 185 87 182.4Q79.8 177.8 85 173.2Z" fill="#a78bfa" opacity=".5" transform="translate(-1.4 -1.2)"/>
+    <path d="M85 173.2C112 169.4 150 178.6 214 167.6C160 183.6 118 185 87 182.4Q79.8 177.8 85 173.2Z" fill="#5c3518" transform="translate(1.4 1.8)"/>
+    <path d="M85 173.2C112 169.4 150 178.6 214 167.6C160 183.6 118 185 87 182.4Q79.8 177.8 85 173.2Z" fill="url(#gSwoosh)" stroke="#fff" stroke-opacity=".14" stroke-width=".8"/>
+    <g clip-path="url(#swooshClip)"><rect class="shimmer" x="30" y="160" width="46" height="30" fill="url(#gShimmer)"/></g>
+    <path d="M89 174.3C114 171 148 178.4 204 169.6" fill="none" stroke="#f6dcb4" stroke-opacity=".8" stroke-width="1.2" stroke-linecap="round"/>
   </g>
   <text class="ui" x="82" y="203" font-size="21" fill="#e0e0e0">A small 3D otter companion for your app</text>
   <text class="ui" x="82" y="228" font-size="15" fill="#b4bfce">Calm, spring-smoothed moods. Always optional, never in the way.</text>
