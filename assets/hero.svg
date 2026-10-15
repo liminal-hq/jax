@@ -116,12 +116,17 @@
       <stop offset="0%" stop-color="#050507"/>
       <stop offset="100%" stop-color="#18121c"/>
     </linearGradient>
-    <!-- House hero-text gradient: white into Afterglow orange and rose -->
-    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="15%" stop-color="#ffffff"/>
-      <stop offset="60%" stop-color="#ffaa40"/>
-      <stop offset="100%" stop-color="#f43f5e"/>
+    <!-- Wordmark lit like Jax: cream highlight through fur brown to dark fur -->
+    <linearGradient id="otter" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff0d6"/>
+      <stop offset="22%" stop-color="#f6dcb4"/>
+      <stop offset="50%" stop-color="#dc9a5a"/>
+      <stop offset="78%" stop-color="#b8743a"/>
+      <stop offset="100%" stop-color="#8a5428"/>
     </linearGradient>
+    <filter id="amber-glow" x="-30%" y="-40%" width="160%" height="180%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
     <linearGradient id="horizonG" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#ffaa40" stop-opacity="0"/>
       <stop offset="30%" stop-color="#ffaa40" stop-opacity=".8"/>
@@ -311,18 +316,34 @@
 
   <!-- Wordmark -->
   <text class="mono" x="83" y="70" font-size="15" fill="#7c8796" letter-spacing=".5">@liminal-hq/jax</text>
-  <text class="display" x="78" y="146" font-size="88" font-weight="700" letter-spacing="-2" fill="url(#brand)" filter="url(#text-glow)">jax</text>
-  <text class="ui" x="82" y="186" font-size="21" fill="#e0e0e0">A small 3D otter companion for your app</text>
-  <text class="ui" x="82" y="215" font-size="15" fill="#b4bfce">Calm, spring-smoothed moods. Always optional, never in the way.</text>
+  <g class="display" font-size="88" font-weight="700" letter-spacing="-2">
+    <!-- amber lamplight behind the letters, breathing with his glow -->
+    <text class="glowBreath" x="78" y="146" fill="#ffb454" opacity=".45" filter="url(#amber-glow)">jax</text>
+    <!-- purple rim from behind-left, then the darker extruded slab side -->
+    <text x="76.4" y="145.6" fill="#a78bfa" opacity=".5">jax</text>
+    <text x="80.5" y="150" fill="#5c3518">jax</text>
+    <text x="79.2" y="148.2" fill="#8a5428">jax</text>
+    <!-- the lit face, with a soft bevel edge -->
+    <text x="78" y="146" fill="url(#otter)" stroke="#fff" stroke-opacity=".16" stroke-width="1">jax</text>
+  </g>
+  <!-- his crimson book, as an underline: cover, pages, spine -->
+  <g>
+    <rect x="84.6" y="173.8" width="62" height="7" rx="2" fill="#a3334b"/>
+    <rect x="83" y="172" width="62" height="7" rx="2" fill="url(#gBook)"/>
+    <rect x="86" y="173.8" width="56" height="2.4" rx="1" fill="#fbfaf6" opacity=".9"/>
+    <rect x="113.4" y="172" width="1.2" height="7" fill="#8a5428" opacity=".7"/>
+  </g>
+  <text class="ui" x="82" y="203" font-size="21" fill="#e0e0e0">A small 3D otter companion for your app</text>
+  <text class="ui" x="82" y="228" font-size="15" fill="#b4bfce">Calm, spring-smoothed moods. Always optional, never in the way.</text>
 
   <!-- Chips -->
   <g class="ui" font-size="12.5" font-weight="600" fill="#e0e0e0">
-    <rect x="82" y="234" width="76" height="26" rx="13" fill="#1f1a24" stroke="#3a3346"/>
-    <text x="120" y="251.5" text-anchor="middle">three.js</text>
-    <rect x="168" y="234" width="92" height="26" rx="13" fill="#1f1a24" stroke="#3a3346"/>
-    <text x="214" y="251.5" text-anchor="middle">TypeScript</text>
-    <rect x="270" y="234" width="104" height="26" rx="13" fill="#1f1a24" stroke="#3a3346"/>
-    <text x="322" y="251.5" text-anchor="middle">SVG fallback</text>
+    <rect x="82" y="242" width="76" height="26" rx="13" fill="#1f1a24" stroke="#3a3346"/>
+    <text x="120" y="259.5" text-anchor="middle">three.js</text>
+    <rect x="168" y="242" width="92" height="26" rx="13" fill="#1f1a24" stroke="#3a3346"/>
+    <text x="214" y="259.5" text-anchor="middle">TypeScript</text>
+    <rect x="270" y="242" width="104" height="26" rx="13" fill="#1f1a24" stroke="#3a3346"/>
+    <text x="322" y="259.5" text-anchor="middle">SVG fallback</text>
   </g>
 
   <!-- Bottom info line: his moods, the current one lit -->
