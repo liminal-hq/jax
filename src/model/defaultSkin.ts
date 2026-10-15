@@ -3,7 +3,7 @@
 // (c) Copyright 2026 Liminal HQ, Scott Morris
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-import type { Skin } from '../types';
+import type { Skin } from '../types.js';
 
 export const defaultSkin: Skin = {
   name: 'afterglow',

@@ -7,9 +7,9 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { MOODS } from '../types';
-import { createFallbackJax } from './index';
-import { FALLBACK_STYLE_ID } from './fallback.css';
+import { MOODS } from '../types.js';
+import { createFallbackJax } from './index.js';
+import { FALLBACK_STYLE_ID } from './fallback.css.js';
 
 afterEach(() => {
   document.body.replaceChildren();

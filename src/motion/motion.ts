@@ -13,11 +13,11 @@ import {
   type MotionOptions,
   type Pose,
   type PoseChannel
-} from '../types';
-import { Crossfade, clamp01, lerp, smootherstep } from './blend';
-import { createMoodMachine, type MoodMachineOptions } from './moodMachine';
-import { defaultPatterns } from './patterns';
-import { SpringChannel } from './spring';
+} from '../types.js';
+import { Crossfade, clamp01, lerp, smootherstep } from './blend.js';
+import { createMoodMachine, type MoodMachineOptions } from './moodMachine.js';
+import { defaultPatterns } from './patterns.js';
+import { SpringChannel } from './spring.js';
 
 /** The fixed internal step, in seconds. Every frame rate is folded onto this grid. */
 export const MOTION_STEP_SECONDS = 1 / 120;

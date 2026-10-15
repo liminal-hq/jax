@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 import { describe, expect, it, vi } from 'vitest';
-import { createSlabCache, ellipse, rect, ring, slab, triangle } from './slab';
+import { createSlabCache, ellipse, rect, ring, slab, triangle } from './slab.js';
 
 describe('slab cache', () => {
   it('reuses geometry for the same shape, depth and bevel', () => {

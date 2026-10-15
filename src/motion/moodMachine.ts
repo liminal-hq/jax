@@ -3,7 +3,7 @@
 // (c) Copyright 2026 Liminal HQ, Scott Morris
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-import { IDLE_ROTATION, TRANSIENT_MOODS, type AnimationPattern, type Mood } from '../types';
+import { IDLE_ROTATION, TRANSIENT_MOODS, type AnimationPattern, type Mood } from '../types.js';
 
 /** How long each transient mood plays when no pattern says otherwise, in milliseconds. */
 export const TRANSIENT_DURATION_MS: Readonly<Partial<Record<Mood, number>>> = {

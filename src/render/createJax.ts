@@ -4,10 +4,10 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 import { PerspectiveCamera, Scene, WebGLRenderer, type Camera } from 'three';
-import { defaultSkin } from '../model/defaultSkin';
-import { buildOtter, type OtterRig } from '../model/otter';
-import { createMotion } from '../motion/motion';
-import { defaultPatterns } from '../motion/patterns';
+import { defaultSkin } from '../model/defaultSkin.js';
+import { buildOtter, type OtterRig } from '../model/otter.js';
+import { createMotion } from '../motion/motion.js';
+import { defaultPatterns } from '../motion/patterns.js';
 import {
   JaxUnavailableError,
   neutralPose,
@@ -16,8 +16,8 @@ import {
   type Mood,
   type Motion,
   type MotionOptions
-} from '../types';
-import { ensureSizeRule, sizeClass } from './sizeStyle';
+} from '../types.js';
+import { ensureSizeRule, sizeClass } from './sizeStyle.js';
 
 /** The part of a renderer the loop needs. `WebGLRenderer` satisfies it. */
 export interface RendererLike {

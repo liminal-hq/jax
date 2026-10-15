@@ -5,9 +5,9 @@
 
 import { describe, expect, it, vi } from 'vitest';
 import { Vector3, type BufferGeometry, type Material, type Object3D } from 'three';
-import { POSE_CHANNELS, PROP_CHANNELS, neutralPose, type PoseChannel } from '../types';
-import { defaultSkin } from './defaultSkin';
-import { PROP_CHANNEL, PROP_NAMES, buildOtter } from './otter';
+import { POSE_CHANNELS, PROP_CHANNELS, neutralPose, type PoseChannel } from '../types.js';
+import { defaultSkin } from './defaultSkin.js';
+import { PROP_CHANNEL, PROP_NAMES, buildOtter } from './otter.js';
 
 /** Everything about the rig that a pose can change, as one comparable string. */
 function snapshot(root: Object3D): string {

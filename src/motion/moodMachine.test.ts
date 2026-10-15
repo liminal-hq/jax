@@ -4,8 +4,8 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 import { describe, expect, it } from 'vitest';
-import type { Mood } from '../types';
-import { createMoodMachine, type MoodMachineOptions } from './moodMachine';
+import type { Mood } from '../types.js';
+import { createMoodMachine, type MoodMachineOptions } from './moodMachine.js';
 
 function seeded(seed: number): () => number {
   let s = seed >>> 0;

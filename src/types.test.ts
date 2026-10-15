@@ -12,7 +12,7 @@ import {
   SUSTAINED_MOODS,
   TRANSIENT_MOODS,
   neutralPose
-} from './types';
+} from './types.js';
 
 describe('the contract', () => {
   it('has a neutral pose with one value per channel and open eyes', () => {
