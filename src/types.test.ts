@@ -58,7 +58,7 @@ describe('the contract', () => {
     expect(TRANSIENT_MOODS.filter((m) => SUSTAINED_MOODS.includes(m))).toEqual([]);
   });
 
-  it('lists the hats he can wear, starting with none', () => {
-    expect([...HATS]).toEqual(['none', 'peakCap', 'topHat']);
+  it('lists the hats he can wear, starting with none and ending with the party hat', () => {
+    expect([...HATS]).toEqual(['none', 'peakCap', 'topHat', 'party']);
   });
 });

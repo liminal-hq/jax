@@ -248,7 +248,7 @@ describe('otter rig', () => {
     });
 
     it('builds the named group for each hat on the head', () => {
-      for (const hat of ['peakCap', 'topHat'] as const) {
+      for (const hat of ['peakCap', 'topHat', 'party'] as const) {
         const rig = buildOtter({ ...defaultSkin, hat });
         expect(rig.hat?.name).toBe(`hat-${hat}`);
         expect(rig.hat?.parent).toBe(rig.head);
@@ -277,6 +277,39 @@ describe('otter rig', () => {
       rig.apply(pose);
       expect(hat.visible).toBe(true);
       expect(material.opacity).toBe(1);
+    });
+
+    it('keeps a chosen party hat on at every party strength, never doubled', () => {
+      const rig = buildOtter({ ...defaultSkin, hat: 'party' });
+      const pose = neutralPose();
+      for (const propHat of [0, 0.5, 1, 0]) {
+        pose.propHat = propHat;
+        rig.apply(pose);
+        const visible: Object3D[] = [];
+        rig.group.traverse((o) => {
+          const shown = (n: Object3D | null): boolean => !n || (n.visible && shown(n.parent));
+          if (o.name === 'hat-party' || o === rig.props.hat) {
+            if (shown(o) && o.children.length > 0) visible.push(o);
+          }
+        });
+        expect(visible).toHaveLength(1);
+        expect(visible[0]).toBe(rig.hat);
+        expect(rig.props.hat.visible).toBe(false);
+        expect(rig.hat!.scale.x).toBeCloseTo(1, 5);
+        const [material] = rig.cache.materialsFor('skinHat');
+        expect(material.opacity).toBe(1);
+      }
+    });
+
+    it('leaves the mood hat prop alone for the other hats', () => {
+      const rig = buildOtter({ ...defaultSkin, hat: 'topHat' });
+      expect(rig.props.hat.children.length).toBeGreaterThan(2);
+      const plain = buildOtter(defaultSkin);
+      expect(plain.props.hat.children.length).toBeGreaterThan(2);
+      const pose = neutralPose();
+      pose.propHat = 0.5;
+      plain.apply(pose);
+      expect(plain.props.hat.visible).toBe(true);
     });
 
     it('frees the hat and cheek geometry on dispose', () => {

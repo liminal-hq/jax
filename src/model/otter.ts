@@ -593,46 +593,59 @@ export function buildOtter(skin: Skin): OtterRig {
     }
   }
 
-  // Party hat on the head
-  const hat = makeProp('hat', head);
-  hat.position.set(0.18, 0.55, 0);
-  hat.rotation.z = -0.3;
-  if (allowed('hat')) {
-    const m = tagged('hat');
-    hat.add(
+  // The party hat's cone, stripe and pompom. The mood prop and the chosen `'party'` hat share them.
+  const buildPartyHat = (target: Group, material: { tag: string; opacity: number }) => {
+    target.add(
       slab(cache, {
         shape: triangle(0.56, 0.7),
         depth: 0.3,
         colour: c.book,
         bevel: 0.03,
-        material: m
+        material
       })
     );
-    hat.add(
+    target.add(
       slab(cache, {
         shape: rect(0.4, 0.06),
         depth: 0.31,
         colour: c.accent,
         position: [0, 0.18, 0.01],
         bevel: 0.01,
-        material: m
+        material
       })
     );
-    hat.add(
+    target.add(
       slab(cache, {
         shape: ellipse(0.08, 0.08),
         depth: 0.12,
         colour: c.accent,
         position: [0, 0.72, 0],
         bevel: 0.02,
-        material: m
+        material
       })
     );
-  }
+  };
+  const partyHatPlace = (target: Group) => {
+    target.position.set(0.18, 0.55, 0);
+    target.rotation.z = -0.3;
+  };
 
-  // The hat the skin asks for, worn on the head. The party hat takes priority while it shows.
+  // Party hat on the head, as the party mood's own prop. A skin that already wears the party hat
+  // never needs a second one, so the prop stays empty then.
+  const hat = makeProp('hat', head);
+  partyHatPlace(hat);
+  if (allowed('hat') && skin.hat !== 'party') buildPartyHat(hat, tagged('hat'));
+
+  // The hat the skin asks for, worn on the head. The mood's party hat takes priority while it shows,
+  // except when the chosen hat is the party hat itself, which simply stays on.
   let skinHat: Group | undefined;
-  if (skin.hat === 'peakCap' || skin.hat === 'topHat') {
+  if (skin.hat === 'party') {
+    skinHat = new Group();
+    skinHat.name = 'hat-party';
+    partyHatPlace(skinHat);
+    buildPartyHat(skinHat, { tag: SKIN_HAT_TAG, opacity: 1 });
+    head.add(skinHat);
+  } else if (skin.hat === 'peakCap' || skin.hat === 'topHat') {
     skinHat = new Group();
     skinHat.name = `hat-${skin.hat}`;
     const main = c.hat ?? 0x3a3550;
@@ -889,9 +902,11 @@ export function buildOtter(skin: Skin): OtterRig {
     // The page swings across the book as `pageFlip` runs from 0 to 1
     page.rotation.y = -Math.PI * clamp01(pose.pageFlip);
 
-    // The chosen hat is present exactly when the party hat is not
+    // The chosen hat is present exactly when the party hat is not. A chosen party hat is always on,
+    // and the mood's own hat is left out so there is never a second one.
+    if (skin.hat === 'party') hat.visible = false;
     if (skinHat) {
-      const worn = 1 - clamp01(pose.propHat);
+      const worn = skin.hat === 'party' ? 1 : 1 - clamp01(pose.propHat);
       skinHat.visible = worn > 0;
       skinHat.scale.setScalar(Math.max(easeOutBack(worn), 0.001));
       const hatFade = Math.min(1, worn * 2);
