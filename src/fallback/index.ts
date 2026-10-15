@@ -161,12 +161,16 @@ function buildSvg(doc: Document, options: JaxOptions): SVGElement {
         el(doc, 'ellipse', { cx: 82, cy: 62, rx: 5, ry: 6, fill: eye }),
         el(doc, 'ellipse', { cx: 118, cy: 62, rx: 5, ry: 6, fill: eye })
       ),
-      ...wornHat(doc, options.skin?.hat, hatColour, hatBand),
-      prop_(
-        'hat',
-        el(doc, 'polygon', { points: '100,6 122,40 78,40', fill: book }),
-        el(doc, 'circle', { cx: 100, cy: 6, r: 5, fill: accent })
-      )
+      ...wornHat(doc, options.skin?.hat, hatColour, hatBand, book, accent),
+      ...(options.skin?.hat === 'party'
+        ? []
+        : [
+            prop_(
+              'hat',
+              el(doc, 'polygon', { points: '100,6 122,40 78,40', fill: book }),
+              el(doc, 'circle', { cx: 100, cy: 6, r: 5, fill: accent })
+            )
+          ])
     ),
     prop_(
       'confetti',
@@ -187,8 +191,27 @@ function buildSvg(doc: Document, options: JaxOptions): SVGElement {
   return svg;
 }
 
-/** The chosen hat in flat SVG. The party mood hides it with CSS, as the party hat takes over. */
-function wornHat(doc: Document, hat: string | undefined, main: string, band: string): SVGElement[] {
+/** The chosen hat in flat SVG. The party mood hides it with CSS, as the party hat takes over; a chosen party hat stays on. */
+function wornHat(
+  doc: Document,
+  hat: string | undefined,
+  main: string,
+  band: string,
+  book: string,
+  accent: string
+): SVGElement[] {
+  if (hat === 'party') {
+    // Always on: it has no `lq-jax-worn-hat` class, so the party mood never hides it.
+    return [
+      el(
+        doc,
+        'g',
+        { class: 'lq-jax-party-hat' },
+        el(doc, 'polygon', { points: '100,6 122,40 78,40', fill: book }),
+        el(doc, 'circle', { cx: 100, cy: 6, r: 5, fill: accent })
+      )
+    ];
+  }
   if (hat === 'peakCap') {
     return [
       el(

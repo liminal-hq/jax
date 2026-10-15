@@ -57,6 +57,24 @@ describe('fallback Jax', () => {
     );
   });
 
+  it('draws a chosen party hat once in any mood and the mood adds no second one', () => {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const jax = createFallbackJax(host, { skin: { ...defaultSkin, hat: 'party' } });
+    for (const mood of MOODS) {
+      jax.setMood(mood);
+      expect(host.querySelectorAll('.lq-jax-party-hat')).toHaveLength(1);
+      expect(host.querySelectorAll('.lq-jax-prop-hat')).toHaveLength(0);
+      expect(host.querySelectorAll('.lq-jax-worn-hat')).toHaveLength(0);
+    }
+    expect(host.querySelectorAll('[style]')).toHaveLength(0);
+    const other = document.createElement('div');
+    document.body.appendChild(other);
+    createFallbackJax(other, { skin: { ...defaultSkin, hat: 'topHat' } });
+    expect(other.querySelectorAll('.lq-jax-party-hat')).toHaveLength(0);
+    expect(other.querySelectorAll('.lq-jax-prop-hat')).toHaveLength(1);
+  });
+
   it('injects one scoped style element however many Jaxes there are', () => {
     const a = document.createElement('div');
     const b = document.createElement('div');
