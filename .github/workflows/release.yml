@@ -170,6 +170,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.prepare-release.outputs.tag_name }}
+          draft: ${{ needs.prepare-release.outputs.release_draft == 'true' }}
           files: release-assets/*.tgz
           fail_on_unmatched_files: true
           overwrite_files: true
@@ -194,9 +195,10 @@ jobs:
         with:
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Use an npm that supports trusted publishing
+        run: npm install -g npm@^11.5.1
+
       - name: Publish package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
           TARBALL="$(find release-assets -maxdepth 1 -name '*.tgz' | head -n 1)"
@@ -204,6 +206,7 @@ jobs:
             echo "No npm package tarball found in release-assets/" >&2
             exit 1
           fi
+          # Authenticated by GitHub's OIDC identity (npm trusted publishing); no stored token.
           npm publish "./${TARBALL}" --access public --provenance
 
       - name: Write summary
