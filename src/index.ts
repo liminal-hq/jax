@@ -4,3 +4,5 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 export * from './types';
+export { createJax } from './render/createJax';
+export { defaultSkin } from './model/defaultSkin';
