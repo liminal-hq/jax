@@ -74,6 +74,8 @@ async function mountAll(): Promise<void> {
   heroJax = hero;
   instances.push(hero);
 
+  // `?solo` skips the tiles, which keeps a software-rendered browser (and the smoothness check) quick
+  if (new URLSearchParams(location.search).has('solo')) return;
   for (const mood of MOODS) {
     const tile = document.createElement('div');
     tile.className = 'tile';
@@ -129,6 +131,30 @@ toggle('Force fallback', 'fallback', () => void mountAll());
 toggle('Reduced motion', 'reduced', () => {
   for (const jax of instances) jax.setReducedMotion(state.reduced);
 });
+
+// A cheap smoothness readout: the frame rate and the worst gap between frames over the last second
+const frameTimes: number[] = [];
+let lastReport = 0;
+function measure(now: number): void {
+  frameTimes.push(now);
+  while (frameTimes.length > 2 && now - frameTimes[0] > 1000) frameTimes.shift();
+  if (frameTimes.length > 2 && now - lastReport > 500) {
+    lastReport = now;
+    report();
+  }
+  requestAnimationFrame(measure);
+}
+function report(): void {
+  let worst = 0;
+  for (let i = 1; i < frameTimes.length; i++) {
+    worst = Math.max(worst, frameTimes[i] - frameTimes[i - 1]);
+  }
+  const span = frameTimes[frameTimes.length - 1] - frameTimes[0];
+  const fps = ((frameTimes.length - 1) / span) * 1000;
+  $('smoothness').textContent =
+    `Smoothness: ${fps.toFixed(0)} fps, worst frame gap ${worst.toFixed(0)} ms`;
+}
+requestAnimationFrame(measure);
 
 setMood('chill');
 void mountAll();
