@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  HATS,
   IDLE_ROTATION,
   MOODS,
   POSE_CHANNELS,
@@ -55,5 +56,9 @@ describe('the contract', () => {
       expect(MOODS).toContain(mood);
     }
     expect(TRANSIENT_MOODS.filter((m) => SUSTAINED_MOODS.includes(m))).toEqual([]);
+  });
+
+  it('lists the hats he can wear, starting with none', () => {
+    expect([...HATS]).toEqual(['none', 'peakCap', 'topHat']);
   });
 });
