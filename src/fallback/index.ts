@@ -35,6 +35,9 @@ function buildSvg(doc: Document, options: JaxOptions): SVGElement {
   const pages = hex(colours?.pages, '#fbfaf6');
   const accent = hex(colours?.accent, '#ffb454');
   const prop = hex(colours?.prop, '#6ecddc');
+  const hatColour = hex(colours?.hat, '#3a3550');
+  const hatBand = hex(colours?.hatBand, accent);
+  const cheeks = options.skin?.cheeks === true;
   const size = options.size ?? 120;
 
   const prop_ = (name: string, ...children: Element[]) =>
@@ -129,8 +132,28 @@ function buildSvg(doc: Document, options: JaxOptions): SVGElement {
       el(doc, 'ellipse', { cx: 100, cy: 74, rx: 48, ry: 40, fill: fur }),
       el(doc, 'ellipse', { cx: 100, cy: 86, rx: 24, ry: 16, fill: cream }),
       el(doc, 'ellipse', { cx: 100, cy: 70, rx: 7, ry: 5, fill: nose }),
-      el(doc, 'ellipse', { cx: 70, cy: 82, rx: 6, ry: 4, fill: blush, opacity: 0.8 }),
-      el(doc, 'ellipse', { cx: 130, cy: 82, rx: 6, ry: 4, fill: blush, opacity: 0.8 }),
+      ...(cheeks
+        ? [
+            el(doc, 'ellipse', {
+              class: 'lq-jax-cheek',
+              cx: 70,
+              cy: 82,
+              rx: 6,
+              ry: 4,
+              fill: blush,
+              opacity: 0.8
+            }),
+            el(doc, 'ellipse', {
+              class: 'lq-jax-cheek',
+              cx: 130,
+              cy: 82,
+              rx: 6,
+              ry: 4,
+              fill: blush,
+              opacity: 0.8
+            })
+          ]
+        : []),
       el(
         doc,
         'g',
@@ -138,6 +161,7 @@ function buildSvg(doc: Document, options: JaxOptions): SVGElement {
         el(doc, 'ellipse', { cx: 82, cy: 62, rx: 5, ry: 6, fill: eye }),
         el(doc, 'ellipse', { cx: 118, cy: 62, rx: 5, ry: 6, fill: eye })
       ),
+      ...wornHat(doc, options.skin?.hat, hatColour, hatBand),
       prop_(
         'hat',
         el(doc, 'polygon', { points: '100,6 122,40 78,40', fill: book }),
@@ -161,6 +185,36 @@ function buildSvg(doc: Document, options: JaxOptions): SVGElement {
     )
   );
   return svg;
+}
+
+/** The chosen hat in flat SVG. The party mood hides it with CSS, as the party hat takes over. */
+function wornHat(doc: Document, hat: string | undefined, main: string, band: string): SVGElement[] {
+  if (hat === 'peakCap') {
+    return [
+      el(
+        doc,
+        'g',
+        { class: 'lq-jax-worn-hat lq-jax-hat-peakCap' },
+        el(doc, 'path', { d: 'M73 46 A27 24 0 0 1 127 46 Z', fill: main }),
+        el(doc, 'rect', { x: 73, y: 41, width: 54, height: 6, fill: band }),
+        el(doc, 'ellipse', { cx: 100, cy: 49, rx: 30, ry: 6, fill: main }),
+        el(doc, 'circle', { cx: 100, cy: 23, r: 3.5, fill: band })
+      )
+    ];
+  }
+  if (hat === 'topHat') {
+    return [
+      el(
+        doc,
+        'g',
+        { class: 'lq-jax-worn-hat lq-jax-hat-topHat' },
+        el(doc, 'ellipse', { cx: 100, cy: 38, rx: 31, ry: 6, fill: main }),
+        el(doc, 'rect', { x: 80, y: 4, width: 40, height: 35, rx: 3, fill: main }),
+        el(doc, 'rect', { x: 80, y: 26, width: 40, height: 8, fill: band })
+      )
+    ];
+  }
+  return [];
 }
 
 function textNode(doc: Document, text: string): Element {

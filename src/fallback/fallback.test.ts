@@ -7,7 +7,8 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { MOODS } from '../types.js';
+import { MOODS, type Skin } from '../types.js';
+import { defaultSkin } from '../model/defaultSkin.js';
 import { createFallbackJax } from './index.js';
 import { FALLBACK_STYLE_ID } from './fallback.css.js';
 
@@ -31,6 +32,29 @@ describe('fallback Jax', () => {
       expect(svg.getAttribute('data-mood')).toBe(mood);
       expect(jax.mood).toBe(mood);
     }
+  });
+
+  it('draws cheeks and a hat only when the skin asks for them', () => {
+    const draw = (skin?: Partial<Skin>) => {
+      const host = document.createElement('div');
+      document.body.appendChild(host);
+      createFallbackJax(host, skin ? { skin: { ...defaultSkin, ...skin } } : {});
+      return host;
+    };
+    const plain = draw();
+    expect(plain.querySelectorAll('.lq-jax-cheek')).toHaveLength(0);
+    expect(plain.querySelectorAll('.lq-jax-worn-hat')).toHaveLength(0);
+    const dressed = draw({ cheeks: true, hat: 'peakCap' });
+    expect(dressed.querySelectorAll('.lq-jax-cheek')).toHaveLength(2);
+    expect(dressed.querySelectorAll('.lq-jax-worn-hat.lq-jax-hat-peakCap')).toHaveLength(1);
+    const tall = draw({ hat: 'topHat' });
+    expect(tall.querySelectorAll('.lq-jax-hat-topHat')).toHaveLength(1);
+    for (const host of [plain, dressed, tall]) {
+      expect(host.querySelectorAll('[style]')).toHaveLength(0);
+    }
+    expect(document.getElementById(FALLBACK_STYLE_ID)!.textContent).toContain(
+      "[data-mood='party'] .lq-jax-worn-hat"
+    );
   });
 
   it('injects one scoped style element however many Jaxes there are', () => {
