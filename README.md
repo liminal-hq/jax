@@ -38,7 +38,7 @@ There are twelve moods: `chill`, `flipping`, `writing`, `checking`, `fishing`, `
 
 Pass a `skin` to dress him differently — start from `defaultSkin` and change its colours, lights or allowed props. Pass `patterns` to replace the motion for any mood: each is an `AnimationPattern` whose `target` returns the pose channels for a moment in time, and the engine springs and crossfades them for you. `createMotion`, `createMoodMachine` and `defaultPatterns` are exported if you want to drive the motion yourself.
 
-Two looks are options on the skin. `cheeks` shows his rosy cheeks and is `false` by default. `hat` is `'none'` (the default), `'peakCap'` or `'topHat'`, with its colours in `colours.hat` and `colours.hatBand`; the party mood brings its own paper hat, which takes priority while it shows, and the chosen hat returns afterwards. The SVG fallback follows both options when you pass the same `skin`.
+Two looks are options on the skin. `cheeks` shows his rosy cheeks and is `false` by default. `hat` is `'none'` (the default), `'peakCap'`, `'topHat'` or `'party'`, with its colours for the caps in `colours.hat` and `colours.hatBand`. The party mood brings its own paper hat, which takes priority over a cap or top hat while it shows, and the chosen hat returns afterwards; choose `'party'` and the paper hat stays on in every mood, never doubled. The SVG fallback follows both options when you pass the same `skin`.
 
 He follows the system reduced-motion setting and holds a still pose, and `setReducedMotion(on)` or the `reducedMotion` option overrides it. He also pauses whenever he is off screen or the tab is hidden.
 

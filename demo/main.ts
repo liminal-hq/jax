@@ -132,7 +132,12 @@ const skinButton = button('Skin: afterglow', () => {
   void mountAll();
 });
 $('controls').append(skinButton);
-const HAT_LABELS: Record<Hat, string> = { none: 'none', peakCap: 'peak cap', topHat: 'top hat' };
+const HAT_LABELS: Record<Hat, string> = {
+  none: 'none',
+  peakCap: 'peak cap',
+  topHat: 'top hat',
+  party: 'party hat'
+};
 const cheeksButton = button('Cheeks', () => {
   state.cheeks = !state.cheeks;
   cheeksButton.setAttribute('aria-pressed', String(state.cheeks));
